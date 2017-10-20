@@ -27,6 +27,7 @@ func GetFile(c net.Conn, path string) (int, error) {
 		fileName = path
 	}
 
+	// Open the file
 	file, err := os.Open(PATH + fileName)
 	if err != nil {
 		// Open file failed.
@@ -35,6 +36,8 @@ func GetFile(c net.Conn, path string) (int, error) {
 	}
 	defer file.Close() // Closing the fd when the function has exited.
 
+	// Read all the data at once.
+	// we need to re-think this.
 	data, err := ioutil.ReadAll(file)
 	n, err := c.Write(data)
 	if err != nil {
