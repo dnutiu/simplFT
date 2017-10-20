@@ -24,35 +24,37 @@ func ProcessInput(c net.Conn, text string) error {
 		return nil
 	}
 
-	switch commands[0] {
+	thisCommand := commands[0]
+
+	switch thisCommand {
 	case "get":
 		// Check arguments
 		err := checkArgumentsLength(commandsLen, 2)
 		if err != nil {
-			return &InputError{commands[0], err}
+			return &InputError{thisCommand, err}
 		}
 
 		// Get the file
 		_, err = SendFile(c, commands[1])
 		if err != nil {
-			return &InputError{"SendFile", err}
+			return &InputError{thisCommand, err}
 		}
 	case "ls":
 		// Check arguments
 		err := checkArgumentsLength(commandsLen, 1)
 		if err != nil {
-			return &InputError{commands[0], err}
+			return &InputError{thisCommand, err}
 		}
 
 		err = ListFiles(c)
 		if err != nil {
-			return &InputError{commands[0], err}
+			return &InputError{thisCommand, err}
 		}
 	case "clear":
 		// Check arguments
 		err := checkArgumentsLength(commandsLen, 1)
 		if err != nil {
-			return &InputError{commands[0], err}
+			return &InputError{thisCommand, err}
 		}
 
 		// Ansi clear: 1b 5b 48 1b 5b 4a
@@ -64,22 +66,22 @@ func ProcessInput(c net.Conn, text string) error {
 		// Check arguments
 		err := checkArgumentsLength(commandsLen, 1)
 		if err != nil {
-			return &InputError{commands[0], err}
+			return &InputError{thisCommand, err}
 		}
 
 		err = ShowHelp(c)
 		if err != nil {
-			return &InputError{commands[0], err}
+			return &InputError{thisCommand, err}
 		}
 	case "exit":
 		err := checkArgumentsLength(commandsLen, 1)
 		if err != nil {
-			return &InputError{commands[0], err}
+			return &InputError{thisCommand, err}
 		}
 
 		c.Close()
 	default:
-		return &InputError{commands[0], InvalidCommand}
+		return &InputError{thisCommand, InvalidCommand}
 	}
 
 	return nil
