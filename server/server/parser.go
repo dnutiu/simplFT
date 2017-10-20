@@ -35,7 +35,7 @@ func ProcessInput(c net.Conn, text string) error {
 		}
 
 		// Get the file
-		_, err = SendFile(c, commands[1])
+		_, err = GetFile(c, commands[1])
 		if err != nil {
 			return &InputError{thisCommand, err}
 		}

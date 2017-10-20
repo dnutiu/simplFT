@@ -14,8 +14,8 @@ import (
 // This will act like a root cage.
 const PATH = "/Users/denis/GoglandProjects/golangBook/GoRoutines/"
 
-// SendFile sends the file to the client and returns true if it succeeds and false otherwise.
-func SendFile(c net.Conn, path string) (int, error) {
+// GetFile sends the file to the client and returns true if it succeeds and false otherwise.
+func GetFile(c net.Conn, path string) (int, error) {
 	var fileName string
 
 	// Make sure the user can't request any files on the system.
