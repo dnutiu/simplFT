@@ -41,10 +41,9 @@ func SendFile(c net.Conn, path string) (int, error) {
 		log.Println(err)
 		return 0, err
 	}
-	// How is this even possible?
+	// This happens when the user ties to get the current directory
 	if n == 0 {
-		log.Println("0 bits written for:", path)
-		return 0, nil
+		return 0, GetNoBitsError
 	}
 
 	return n, nil

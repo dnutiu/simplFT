@@ -19,3 +19,8 @@ var (
 	TooManyArguments = errors.New("Too many arguments.")
 	TooFewArguments  = errors.New("Too few arguments.")
 )
+
+// Command Errors
+var (
+	GetNoBitsError = errors.New("The file/directory contains zero bits!")
+)
