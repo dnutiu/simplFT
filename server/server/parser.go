@@ -58,7 +58,19 @@ func ProcessInput(c net.Conn, text string) error {
 		// Ansi clear: 1b 5b 48 1b 5b 4a
 		// clear | hexdump -C
 		var b []byte = []byte{0x1b, 0x5b, 0x48, 0x1b, 0x5b, 0x4a}
+
 		c.Write(b)
+	case "help":
+		// Check arguments
+		err := checkArgumentsLength(commandsLen, 1)
+		if err != nil {
+			return &InputError{commands[0], err}
+		}
+
+		err = ShowHelp(c)
+		if err != nil {
+			return &InputError{commands[0], err}
+		}
 	case "exit":
 		err := checkArgumentsLength(commandsLen, 1)
 		if err != nil {

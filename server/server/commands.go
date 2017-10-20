@@ -22,7 +22,7 @@ func SendFile(c net.Conn, path string) (int, error) {
 	lastForwardSlash := strings.LastIndex(path, "/")
 	if lastForwardSlash != -1 {
 		// Eliminate the last forward slash i.e ../../asdas will become asdas
-		fileName = path[lastForwardSlash + 1:]
+		fileName = path[lastForwardSlash+1:]
 	} else {
 		fileName = path
 	}
@@ -50,7 +50,6 @@ func SendFile(c net.Conn, path string) (int, error) {
 	return n, nil
 }
 
-
 // ListFiles list the files from path and sends them to the connection
 func ListFiles(c net.Conn) error {
 	files, err := ioutil.ReadDir(PATH)
@@ -70,4 +69,17 @@ func ListFiles(c net.Conn) error {
 	}
 
 	return nil
+}
+
+func ShowHelp(c net.Conn) error {
+	var helpText string = `
+The available commands are:
+get <filename> - Download the requested filename.
+ls - List the files in the current directory.
+clear - Clear the screen.
+exit - Close the connection with the server.
+`
+	_, err := c.Write([]byte(helpText))
+
+	return err
 }
