@@ -12,7 +12,9 @@ type InputError struct {
 
 func (e *InputError) Error() string { return "Error: " + e.Op + ": " + e.Err.Error() }
 
+// Input Errors
 var (
+	UnknownError     = errors.New("Unknown Error.")
 	InvalidCommand   = errors.New("Invalid command.")
 	TooManyArguments = errors.New("Too many arguments.")
 	TooFewArguments  = errors.New("Too few arguments.")
