@@ -1,9 +1,9 @@
 package main
 
 import (
-	"net"
-	"log"
 	"github.com/metonimie/simpleFTP/server/server"
+	"log"
+	"net"
 )
 
 func main() {

@@ -1,8 +1,8 @@
 package server
 
 import (
-	"testing"
 	"math/rand"
+	"testing"
 )
 
 func TestMakeStringStack(t *testing.T) {

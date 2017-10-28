@@ -1,13 +1,13 @@
 package server
 
 import (
-	"net"
-	"strings"
-	"os"
-	"log"
-	"io/ioutil"
 	"bytes"
+	"io/ioutil"
+	"log"
+	"net"
+	"os"
 	"strconv"
+	"strings"
 )
 
 // PATH is the constant which should contain the fixed path where the simpleFTP server will run

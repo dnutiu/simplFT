@@ -36,5 +36,5 @@ func (e StackError) Error() string { return e.ErrorName + ": " + e.Err.Error() }
 var (
 	StackInvalidTypeError = StackError{"InvalidTypeError", errors.New("Invalid item type for the Stack")}
 	StackOverflowError    = StackError{"StackOverflowError", errors.New("Stack capacity exceeded!")}
-	StackUnderflowError    = StackError{"StackUnderflowError", errors.New("Stack is empty!")}
+	StackUnderflowError   = StackError{"StackUnderflowError", errors.New("Stack is empty!")}
 )

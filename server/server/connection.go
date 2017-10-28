@@ -1,10 +1,10 @@
 package server
 
 import (
-	"net"
+	"bufio"
 	"io"
 	"log"
-	"bufio"
+	"net"
 )
 
 func HandleConnection(c net.Conn) {
