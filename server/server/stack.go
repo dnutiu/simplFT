@@ -39,14 +39,12 @@ func (st *StringStack) Push(item interface{}) {
 	}
 
 	value, ok := item.(string)
-
 	if ok == false {
 		panic(StackInvalidTypeError)
 	}
 
 	st.items[st.index] = value
 	st.index++
-
 }
 
 func (st *StringStack) Pop() interface{} {
