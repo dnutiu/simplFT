@@ -16,8 +16,43 @@ const PATH = "/Users/denis/GoglandProjects/golangBook/GoRoutines/"
 
 // GetFile sends the file to the client and returns true if it succeeds and false otherwise.
 func GetFile(c net.Conn, path string) (int, error) {
-	var fileName string
+	fileName := sanitizeFilePath(path)
 
+	file, err := os.Open(PATH + fileName)
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	defer file.Close()
+
+	data, err := readFileData(file)
+	if err != nil {
+		return 0, err
+	}
+
+	n, err := c.Write(data)
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	if n == 0 {
+		// This happens when the user ties to get the current directory
+		return 0, GetNoBitsError
+	}
+	return n, nil
+}
+
+func readFileData(file *os.File) ([]byte, error) {
+	data, err := ioutil.ReadAll(file)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return data, nil
+}
+
+func sanitizeFilePath(path string) string {
+	var fileName string
 	// Make sure the user can't request any files on the system.
 	lastForwardSlash := strings.LastIndex(path, "/")
 	if lastForwardSlash != -1 {
@@ -26,37 +61,14 @@ func GetFile(c net.Conn, path string) (int, error) {
 	} else {
 		fileName = path
 	}
-
-	// Open the file
-	file, err := os.Open(PATH + fileName)
-	if err != nil {
-		// Open file failed.
-		log.Println(err)
-		return 0, err
-	}
-	defer file.Close() // Closing the fd when the function has exited.
-
-	// Read all the data at once.
-	// we need to re-think this.
-	data, err := ioutil.ReadAll(file)
-	n, err := c.Write(data)
-	if err != nil {
-		log.Println(err)
-		return 0, err
-	}
-	// This happens when the user ties to get the current directory
-	if n == 0 {
-		return 0, GetNoBitsError
-	}
-
-	return n, nil
+	return fileName
 }
 
 // ListFiles list the files from path and sends them to the connection
 func ListFiles(c net.Conn) error {
 	files, err := ioutil.ReadDir(PATH)
 	if err != nil {
-		return err;
+		return err
 	}
 
 	buffer := bytes.NewBufferString("Directory Mode Size LastModified Name\n")
