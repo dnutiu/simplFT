@@ -39,7 +39,7 @@ func TestStringStack_CanPush(t *testing.T) {
 
 func TestStringStack_StackOverflows(t *testing.T) {
 	defer func() {
-		if r := recover(); r == nil {
+		if r := recover(); r != StackOverflowError {
 			t.Errorf("StringStack: Capacity of 0 doesn't overflow on Push()!")
 		}
 	}()
@@ -50,7 +50,7 @@ func TestStringStack_StackOverflows(t *testing.T) {
 
 func TestStringStack_InvalidType(t *testing.T) {
 	defer func() {
-		if r := recover(); r == nil {
+		if r := recover(); r != StackInvalidTypeError {
 			t.Errorf("StringStack: Push() pushed a non-string type.")
 		}
 	}()
@@ -118,7 +118,7 @@ func TestStringStack_Top(t *testing.T) {
 
 func TestStringStack_TopUnderflow(t *testing.T) {
 	defer func() {
-		if r := recover(); r == nil {
+		if r := recover(); r != StackUnderflowError {
 			t.Errorf("StringStack: Top() on empty stack didn't underflow.")
 		}
 	}()
