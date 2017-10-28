@@ -8,9 +8,9 @@ import (
 // checkArgumentsLength returns an error if length is not equal to expected.
 func checkArgumentsLength(length int, expected int) error {
 	if length > expected {
-		return TooManyArguments
+		return InputTooManyArguments
 	} else if length < expected {
-		return TooFewArguments
+		return InputTooFewArguments
 	}
 	return nil
 }
@@ -81,7 +81,7 @@ func ProcessInput(c net.Conn, text string) error {
 
 		c.Close()
 	default:
-		return &InputError{thisCommand, InvalidCommand}
+		return &InputError{thisCommand, InputInvalidCommand}
 	}
 
 	return nil
