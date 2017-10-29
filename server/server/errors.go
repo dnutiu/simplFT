@@ -37,3 +37,10 @@ var (
 	StackOverflowError    = StackError{"StackOverflowError", errors.New("stack capacity exceeded")}
 	StackUnderflowError   = StackError{"StackUnderflowError", errors.New("stack is empty")}
 )
+
+// PathErrors
+var (
+	ErrInvalidDirectoryName   = errors.New("names should not contain / character")
+	ErrNotADirectory          = errors.New("file name is not a valid directory")
+	ErrAlreadyAtBaseDirectory = errors.New("can't go past beyond root directory")
+)

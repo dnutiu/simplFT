@@ -10,15 +10,11 @@ import (
 	"strings"
 )
 
-// PATH is the constant which should contain the fixed path where the simpleFTP server will run
-// This will act like a root cage.
-const PATH = "/Users/denis/GoglandProjects/golangBook/GoRoutines/"
-
 // GetFile sends the file to the client and returns true if it succeeds and false otherwise.
 func GetFile(c net.Conn, path string) (int, error) {
 	fileName := sanitizeFilePath(path)
 
-	file, err := os.Open(PATH + fileName)
+	file, err := os.Open(BasePath + fileName)
 	if err != nil {
 		log.Println(err)
 		return 0, err
@@ -66,7 +62,7 @@ func sanitizeFilePath(path string) string {
 
 // ListFiles list the files from path and sends them to the connection
 func ListFiles(c net.Conn) error {
-	files, err := ioutil.ReadDir(PATH)
+	files, err := ioutil.ReadDir(BasePath)
 	if err != nil {
 		return err
 	}
