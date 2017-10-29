@@ -86,7 +86,7 @@ func ListFiles(c net.Conn) error {
 }
 
 func ShowHelp(c net.Conn) error {
-	var helpText string = `
+	var helpText = `
 The available commands are:
 get <filename> - Download the requested filename.
 ls - List the files in the current directory.
