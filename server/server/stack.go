@@ -23,6 +23,7 @@ type StringStack struct {
 	items    []string
 }
 
+// MakeStringStack initializes a new StringStack pointer.
 func MakeStringStack(capacity int) *StringStack {
 	st := StringStack{}
 
@@ -33,6 +34,7 @@ func MakeStringStack(capacity int) *StringStack {
 	return &st
 }
 
+// Push pushes an item of type string to the stack.
 func (st *StringStack) Push(item interface{}) {
 	if st.index == st.Capacity() {
 		panic(StackOverflowError)
@@ -47,6 +49,7 @@ func (st *StringStack) Push(item interface{}) {
 	st.index++
 }
 
+// Pop returns the last pushed item from the stack and removes it
 func (st *StringStack) Pop() interface{} {
 	if st.Size() == 0 {
 		panic(StackUnderflowError)
@@ -55,6 +58,7 @@ func (st *StringStack) Pop() interface{} {
 	return st.items[st.index]
 }
 
+// Top return the last pushed item from the stack without removing it.
 func (st *StringStack) Top() interface{} {
 	if st.Size() == 0 {
 		panic(StackUnderflowError)
@@ -62,14 +66,22 @@ func (st *StringStack) Top() interface{} {
 	return st.items[st.index-1]
 }
 
+// IsEmpty returns true if the stack contains no items.
 func (st *StringStack) IsEmpty() bool {
 	return st.Size() == 0
 }
 
+// Capacity returns the maximum items the stack can hold.
 func (st *StringStack) Capacity() int {
 	return st.capacity
 }
 
+// Size returns number of items the stack currently holds.
 func (st *StringStack) Size() int {
 	return st.index
+}
+
+// Items returns an array of the stack items as a copy.
+func (st StringStack) Items() []string {
+	return st.items
 }
