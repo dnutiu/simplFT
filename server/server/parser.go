@@ -19,7 +19,6 @@ func ProcessInput(c net.Conn, text string) error {
 	commands := strings.Fields(text)
 	commandsLen := len(commands)
 
-	// Possibly empty input, just go on.
 	if commandsLen == 0 {
 		return nil
 	}
@@ -28,7 +27,6 @@ func ProcessInput(c net.Conn, text string) error {
 
 	switch thisCommand {
 	case "get":
-		// Check arguments
 		err := checkArgumentsLength(commandsLen, 2)
 		if err != nil {
 			return &InputError{thisCommand, err}
@@ -40,7 +38,6 @@ func ProcessInput(c net.Conn, text string) error {
 			return &InputError{thisCommand, err}
 		}
 	case "ls":
-		// Check arguments
 		err := checkArgumentsLength(commandsLen, 1)
 		if err != nil {
 			return &InputError{thisCommand, err}
@@ -51,7 +48,6 @@ func ProcessInput(c net.Conn, text string) error {
 			return &InputError{thisCommand, err}
 		}
 	case "clear":
-		// Check arguments
 		err := checkArgumentsLength(commandsLen, 1)
 		if err != nil {
 			return &InputError{thisCommand, err}
