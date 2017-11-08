@@ -1,7 +1,6 @@
 package server
 
 import (
-	"net"
 	"strings"
 )
 
@@ -15,7 +14,7 @@ func checkArgumentsLength(length int, expected int) error {
 	return nil
 }
 
-func ProcessInput(c net.Conn, text string) error {
+func ProcessInput(c Client, text string) error {
 	commands := strings.Fields(text)
 	commandsLen := len(commands)
 
@@ -33,7 +32,7 @@ func ProcessInput(c net.Conn, text string) error {
 		}
 
 		// Get the file
-		_, err = GetFile(c, commands[1])
+		_, err = GetFile(c.Connection(), commands[1])
 		if err != nil {
 			return &InputError{thisCommand, err}
 		}
@@ -43,7 +42,7 @@ func ProcessInput(c net.Conn, text string) error {
 			return &InputError{thisCommand, err}
 		}
 
-		err = ListFiles(c)
+		err = ListFiles(c.Connection())
 		if err != nil {
 			return &InputError{thisCommand, err}
 		}
@@ -57,7 +56,7 @@ func ProcessInput(c net.Conn, text string) error {
 		// clear | hexdump -C
 		var b = []byte{0x1b, 0x5b, 0x48, 0x1b, 0x5b, 0x4a}
 
-		c.Write(b)
+		c.Connection().Write(b)
 	case "help":
 		// Check arguments
 		err := checkArgumentsLength(commandsLen, 1)
@@ -65,7 +64,7 @@ func ProcessInput(c net.Conn, text string) error {
 			return &InputError{thisCommand, err}
 		}
 
-		err = ShowHelp(c)
+		err = ShowHelp(c.Connection())
 		if err != nil {
 			return &InputError{thisCommand, err}
 		}
@@ -75,7 +74,7 @@ func ProcessInput(c net.Conn, text string) error {
 			return &InputError{thisCommand, err}
 		}
 
-		c.Close()
+		c.Connection().Close()
 	default:
 		return &InputError{thisCommand, InputInvalidCommand}
 	}

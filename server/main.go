@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/metonimie/simpleFTP/server/server"
 	"log"
 	"net"
+
+	"github.com/metonimie/simpleFTP/server/server"
 )
 
 func main() {
@@ -16,12 +17,17 @@ func main() {
 	log.Println("Running on:", "localhost", "port", "8080")
 
 	for {
+
 		conn, err := listener.Accept()
 		if err != nil {
 			log.Print(err)
 			continue
 		}
 
-		go server.HandleConnection(conn)
+		client := server.FTPClient{}
+		client.SetStack(new(server.StringStack))
+		client.SetConnection(conn)
+
+		go server.HandleConnection(&client)
 	}
 }
