@@ -36,6 +36,7 @@ var (
 	StackInvalidTypeError = StackError{"InvalidTypeError", errors.New("invalid item type for the Stack")}
 	StackOverflowError    = StackError{"StackOverflowError", errors.New("stack capacity exceeded")}
 	StackUnderflowError   = StackError{"StackUnderflowError", errors.New("stack is empty")}
+	ErrStackCast          = StackError{"StackCastError", errors.New("stack can't be casted to selected type")}
 )
 
 // PathErrors

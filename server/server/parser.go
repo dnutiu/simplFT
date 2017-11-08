@@ -32,7 +32,7 @@ func ProcessInput(c Client, text string) error {
 		}
 
 		// Get the file
-		_, err = GetFile(c.Connection(), commands[1])
+		_, err = GetFile(c, commands[1])
 		if err != nil {
 			return &InputError{thisCommand, err}
 		}
@@ -42,7 +42,7 @@ func ProcessInput(c Client, text string) error {
 			return &InputError{thisCommand, err}
 		}
 
-		err = ListFiles(c.Connection())
+		err = ListFiles(c)
 		if err != nil {
 			return &InputError{thisCommand, err}
 		}
@@ -64,7 +64,7 @@ func ProcessInput(c Client, text string) error {
 			return &InputError{thisCommand, err}
 		}
 
-		err = ShowHelp(c.Connection())
+		err = ShowHelp(c)
 		if err != nil {
 			return &InputError{thisCommand, err}
 		}
@@ -74,7 +74,7 @@ func ProcessInput(c Client, text string) error {
 			return &InputError{thisCommand, err}
 		}
 
-		c.Connection().Close()
+		c.Disconnect()
 	default:
 		return &InputError{thisCommand, InputInvalidCommand}
 	}

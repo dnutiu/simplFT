@@ -13,7 +13,7 @@ type Client interface {
 	Connection() net.Conn        // Connection returns the connection stream.
 	SetConnection(conn net.Conn) // SetConnection sets the connection for the client.
 	Disconnect()                 // Disconnect closes the Client's connections and clears up resources.
-	Stack() Stack                // Returns the underlying Stack.
+	Stack() Stack                // Returns the underlying String Stack.
 }
 
 // FTPClient represents a FTPClient connection, it holds a root cage and the underlying connection.

@@ -4,17 +4,21 @@ import (
 	"bytes"
 	"io/ioutil"
 	"log"
-	"net"
 	"os"
 	"strconv"
 	"strings"
 )
 
 // GetFile sends the file to the client and returns true if it succeeds and false otherwise.
-func GetFile(c net.Conn, path string) (int, error) {
+func GetFile(c Client, path string) (int, error) {
 	fileName := sanitizeFilePath(path)
 
-	file, err := os.Open(BasePath + fileName)
+	stack, ok := c.Stack().(*StringStack)
+	if !ok {
+		return 0, ErrStackCast
+	}
+
+	file, err := os.Open(MakePathFromStringStack(stack) + fileName)
 	if err != nil {
 		log.Println(err)
 		return 0, err
@@ -26,7 +30,7 @@ func GetFile(c net.Conn, path string) (int, error) {
 		return 0, err
 	}
 
-	n, err := c.Write(data)
+	n, err := c.Connection().Write(data)
 	if err != nil {
 		log.Println(err)
 		return 0, err
@@ -61,8 +65,13 @@ func sanitizeFilePath(path string) string {
 }
 
 // ListFiles list the files from path and sends them to the connection
-func ListFiles(c net.Conn) error {
-	files, err := ioutil.ReadDir(BasePath)
+func ListFiles(c Client) error {
+	stack, ok := c.Stack().(*StringStack)
+	if !ok {
+		return ErrStackCast
+	}
+
+	files, err := ioutil.ReadDir(MakePathFromStringStack(stack))
 	if err != nil {
 		return err
 	}
@@ -73,7 +82,7 @@ func ListFiles(c net.Conn) error {
 			strconv.FormatInt(f.Size(), 10) + " " + f.ModTime().String() + " " + string(f.Name()) + " " + "\n")
 	}
 
-	_, err = c.Write(buffer.Bytes())
+	_, err = c.Connection().Write(buffer.Bytes())
 	if err != nil {
 		return err
 	}
@@ -81,7 +90,7 @@ func ListFiles(c net.Conn) error {
 	return nil
 }
 
-func ShowHelp(c net.Conn) error {
+func ShowHelp(c Client) error {
 	var helpText = `
 The available commands are:
 get <filename> - Download the requested filename.
@@ -89,7 +98,7 @@ ls - List the files in the current directory.
 clear - Clear the screen.
 exit - Close the connection with the server.
 `
-	_, err := c.Write([]byte(helpText))
+	_, err := c.Connection().Write([]byte(helpText))
 
 	return err
 }
