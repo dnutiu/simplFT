@@ -25,7 +25,7 @@ func main() {
 		}
 
 		client := server.FTPClient{}
-		client.SetStack(new(server.StringStack))
+		client.SetStack(server.MakeStringStack(30))
 		client.SetConnection(conn)
 
 		go server.HandleConnection(&client)

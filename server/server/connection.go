@@ -2,21 +2,18 @@ package server
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"log"
 	"net"
 )
-
-// ClientStack interface holds the function needed to work with a stack.
-type ClientStack interface {
-	Stack() Stack // Returns the underlying Stack.
-}
 
 // Client interface provides the blueprints for the Client that is used by the server.
 type Client interface {
 	Connection() net.Conn        // Connection returns the connection stream.
 	SetConnection(conn net.Conn) // SetConnection sets the connection for the client.
 	Disconnect()                 // Disconnect closes the Client's connections and clears up resources.
+	Stack() Stack                // Returns the underlying Stack.
 }
 
 // FTPClient represents a FTPClient connection, it holds a root cage and the underlying connection.
@@ -52,6 +49,17 @@ func (c *FTPClient) Disconnect() {
 
 func HandleConnection(client Client) {
 	defer client.Disconnect()
+	defer func() {
+		if r := recover(); r != nil {
+			log.Println("PANIC: ", r)
+
+			recoveryError, ok := r.(string)
+			if ok {
+				io.WriteString(client.Connection(), fmt.Sprintf("PANIC: %s", recoveryError))
+			}
+		}
+	}()
+
 	io.WriteString(client.Connection(), "Hello and welcome to simple ftp\n")
 
 	log.Println(client.Connection().RemoteAddr(), "has connected.")
