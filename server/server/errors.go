@@ -44,4 +44,5 @@ var (
 	ErrInvalidDirectoryName   = errors.New("names should not contain / character")
 	ErrNotADirectory          = errors.New("file name is not a valid directory")
 	ErrAlreadyAtBaseDirectory = errors.New("can't go past beyond root directory")
+	ErrSlashNotAllowed        = errors.New("slash is not allowed in file names")
 )

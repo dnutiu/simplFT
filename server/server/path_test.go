@@ -7,16 +7,6 @@ import (
 	"testing"
 )
 
-func TestGetPath_StackIsEmpty(t *testing.T) {
-	st := MakeStringStack(1)
-
-	path := GetPath(st)
-
-	if path != BasePath {
-		t.Errorf("TestGetPath: Base path is not returned when stack is empty.")
-	}
-}
-
 func TestMakePathFromStringStack(t *testing.T) {
 	st := MakeStringStack(5)
 
@@ -25,7 +15,7 @@ func TestMakePathFromStringStack(t *testing.T) {
 	st.Push("trinity")
 
 	path := MakePathFromStringStack(st)
-	expected := fmt.Sprintf("%s/%s/%s/%s/", BasePath, "first", "folder two", "trinity")
+	expected := fmt.Sprintf("%s%s/%s/%s/", BasePath, "first", "folder two", "trinity")
 
 	if path != expected {
 		t.Errorf("TestMakePathFromStringStack: Returned an invalid path! Want %s Got %s", expected, path)
@@ -75,6 +65,23 @@ func TestChangeDirectory(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestChangeDirectory: Step5: %s", err.Error())
 	}
+}
+
+func TestChangeDirectory_InvalidDirectoryIsNotInStack(t *testing.T) {
+	st := MakeStringStack(1)
+	err := os.Chdir(BasePath)
+	if err != nil {
+		t.Errorf("TestChangeDirectory_InvalidDirectoryIsNotInStack: Step1: %s", err.Error())
+	}
+
+	dirName := string(rand.Intn(10000))
+
+	// ignore no such directory error
+	ChangeDirectory(st, dirName)
+	if !st.IsEmpty() && st.Top() == dirName {
+		t.Errorf("TestChangeDirectory: Stack is corrupted because invalid directory remained in stack")
+	}
+
 }
 
 func TestChangeDirectory_InvalidDirectoryName(t *testing.T) {

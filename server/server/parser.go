@@ -25,6 +25,16 @@ func ProcessInput(c Client, text string) error {
 	thisCommand := commands[0]
 
 	switch thisCommand {
+	case "cd":
+		err := checkArgumentsLength(commandsLen, 2)
+		if err != nil {
+			return &InputError{thisCommand, err}
+		}
+
+		err = ChangeDirectoryCommand(c, commands[1])
+		if err != nil {
+			return err
+		}
 	case "get":
 		err := checkArgumentsLength(commandsLen, 2)
 		if err != nil {
@@ -52,11 +62,10 @@ func ProcessInput(c Client, text string) error {
 			return &InputError{thisCommand, err}
 		}
 
-		// Ansi clear: 1b 5b 48 1b 5b 4a
-		// clear | hexdump -C
-		var b = []byte{0x1b, 0x5b, 0x48, 0x1b, 0x5b, 0x4a}
-
-		c.Connection().Write(b)
+		err = ClearScreen(c)
+		if err != nil {
+			return err
+		}
 	case "help":
 		// Check arguments
 		err := checkArgumentsLength(commandsLen, 1)
