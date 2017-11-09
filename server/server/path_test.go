@@ -84,14 +84,6 @@ func TestChangeDirectory_InvalidDirectoryIsNotInStack(t *testing.T) {
 
 }
 
-func TestChangeDirectory_InvalidDirectoryName(t *testing.T) {
-	st := MakeStringStack(1)
-	err := ChangeDirectory(st, "some/not/cool/directory/")
-	if err != ErrInvalidDirectoryName {
-		t.Error("TestChangeDirectory: Changed directory to something containing the '/' character!")
-	}
-}
-
 func TestChangeDirectoryToPrevious_StackIsEmpty(t *testing.T) {
 	st := MakeStringStack(1)
 	err := ChangeDirectoryToPrevious(st)

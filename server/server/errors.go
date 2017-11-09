@@ -39,10 +39,16 @@ var (
 	ErrStackCast          = StackError{"StackCastError", errors.New("stack can't be casted to selected type")}
 )
 
+type PathError struct {
+	Err error
+}
+
+func (e PathError) Error() string { return "Error: " + e.Err.Error() }
+
 // PathErrors
 var (
-	ErrInvalidDirectoryName   = errors.New("names should not contain / character")
-	ErrNotADirectory          = errors.New("file name is not a valid directory")
-	ErrAlreadyAtBaseDirectory = errors.New("can't go past beyond root directory")
-	ErrSlashNotAllowed        = errors.New("slash is not allowed in file names")
+	ErrInvalidDirectoryName   = PathError{errors.New("names should not contain / character")}
+	ErrNotADirectory          = PathError{errors.New("file name is not a valid directory")}
+	ErrAlreadyAtBaseDirectory = PathError{errors.New("can't go past beyond root directory")}
+	ErrSlashNotAllowed        = PathError{errors.New("slash is not allowed in file names")}
 )

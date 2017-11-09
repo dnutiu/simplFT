@@ -39,16 +39,13 @@ func MakePathFromStringStack(stack *StringStack) string {
 
 // ChangeDirectory changes the current working directory with respect to BasePath
 func ChangeDirectory(stack *StringStack, directory string) error {
-	if containsSlash(directory) == true {
-		return ErrInvalidDirectoryName
-	}
 	stack.Push(directory)
 
 	path := MakePathFromStringStack(stack)
 	fileInfo, err := os.Stat(path)
 	if err != nil {
 		stack.Pop()
-		return err
+		return PathError{err}
 	}
 
 	if fileInfo.IsDir() == false {
@@ -64,7 +61,7 @@ func ChangeDirectory(stack *StringStack, directory string) error {
 		return nil
 	}
 	stack.Pop()
-	return os.ErrPermission
+	return PathError{err}
 }
 
 // ChangeDirectoryToPrevious changes the current working directory to the previous one,
