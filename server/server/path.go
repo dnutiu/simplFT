@@ -21,15 +21,6 @@ func containsSlash(dir string) bool {
 // This will act like a root cage. It must end with a forward slash!
 var BasePath = "/Users/denis/GoglandProjects/golangBook/"
 
-// GetPath will return the complete path
-//func GetPath(stack *StringStack) string {
-//	if stack.IsEmpty() {
-//		return BasePath
-//	}
-//
-//	return BasePath
-//}
-
 // MakePathFromStringStack gets a StringStack and makes a path.
 func MakePathFromStringStack(stack *StringStack) string {
 	var buffer bytes.Buffer
