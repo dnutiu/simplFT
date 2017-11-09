@@ -119,7 +119,9 @@ func ChangeDirectoryCommand(c Client, directory string) error {
 		return ErrStackCast
 	}
 
-	if path == ".." {
+	if path == "." {
+		err = nil
+	} else if path == ".." {
 		err = ChangeDirectoryToPrevious(stack)
 	} else {
 		err = ChangeDirectory(stack, path)
