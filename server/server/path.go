@@ -8,18 +8,9 @@ import (
 	"os"
 )
 
-func containsSlash(dir string) bool {
-	for _, c := range dir {
-		if c == '/' {
-			return true
-		}
-	}
-	return false
-}
-
 // PATH is the constant which should contain the fixed path where the simpleFTP server will run
 // This will act like a root cage. It must end with a forward slash!
-var BasePath = "/Users/denis/GoglandProjects/golangBook/"
+var BasePath = ""
 
 // MakePathFromStringStack gets a StringStack and makes a path.
 func MakePathFromStringStack(stack *StringStack) string {
