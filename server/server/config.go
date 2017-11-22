@@ -4,8 +4,13 @@ package server
 import (
 	"log"
 
+	"flag"
+
 	"github.com/spf13/viper"
 )
+
+// ConfigPath will be used via cmd to set the configuration path for the config file.
+var ConfigPath string
 
 // LoadConfig tries to load the configuration file from the disk.
 func LoadConfigFromFile() error {
@@ -23,17 +28,18 @@ func LoadConfigFromFile() error {
 func SetDefaultConfiguration() {
 	viper.SetDefault("Address", "localhost")
 	viper.SetDefault("Port", "8080")
-	viper.SetDefault("ConfigPath", ".")
+	viper.SetDefault("ConfigPath", ConfigPath)
 	viper.SetDefault("MaxDirDepth", 30)
 	viper.SetDefault("AbsoluteServePath", "./")
 }
 
 // InitializedConfiguration initializes the configuration for the application.
 func InitializedConfiguration() {
+	flag.StringVar(&ConfigPath, "ConfigPath", ".", "Set the location of the config file.")
+	flag.Parse()
+
 	SetDefaultConfiguration()
+
 	LoadConfigFromFile()
-
-	// TODO, Override from command line flags.
-
 	BasePath = viper.GetString("AbsoluteServePath")
 }

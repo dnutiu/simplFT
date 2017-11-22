@@ -7,7 +7,8 @@ execute commands on it.
 
 ## Configuration
 
-The server can be configured via command line flags (soon to come) and a configuration file.
+The server can be configured via command line flags with the -ConfigPath option,
+specifying a path to the configuration file.
 If no configuration file is provided the server will run with the default settings.
 
 Sample Configuration File:
