@@ -60,8 +60,6 @@ func HandleConnection(client Client) {
 		}
 	}()
 
-	io.WriteString(client.Connection(), "Hello and welcome to simple ftp\n")
-
 	log.Println(client.Connection().RemoteAddr(), "has connected.")
 
 	// Process input
