@@ -67,12 +67,6 @@ func HandleConnection(client Client) {
 	// Process input
 	input := bufio.NewScanner(client.Connection())
 
-	stack, ok := client.Stack().(*StringStack)
-	if ok == false {
-		panic("Cannot cast client.Stack() to *StringStack!")
-	}
-
-	prompt(client, stack)
 	for input.Scan() {
 		log.Println(client.Connection().RemoteAddr(), ":", input.Text())
 
@@ -81,17 +75,8 @@ func HandleConnection(client Client) {
 			log.Println(err)
 			io.WriteString(client.Connection(), err.Error()+"\n")
 		}
-		prompt(client, stack)
 	}
 
 	// Client has left.
 	log.Println(client.Connection().RemoteAddr(), "has disconnected.")
-}
-
-func prompt(client Client, stack *StringStack) (int, error) {
-	var str string
-	if !stack.IsEmpty() {
-		str = stack.Top().(string) + " "
-	}
-	return io.WriteString(client.Connection(), str+"ftp> ")
 }
