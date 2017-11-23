@@ -12,8 +12,8 @@ import (
 // ConfigPath will be used via cmd to set the configuration path for the config file.
 var ConfigPath string
 
-// LoadConfig tries to load the configuration file from the disk.
-func LoadConfigFromFile() error {
+// loadConfigFromFile tries to load the configuration file from the disk.
+func loadConfigFromFile() error {
 	viper.SetConfigName("config")
 	viper.AddConfigPath(viper.GetString("ConfigPath"))
 
@@ -24,8 +24,8 @@ func LoadConfigFromFile() error {
 	return err
 }
 
-// SetDefaultConfiguration will set the default configuration settings.
-func SetDefaultConfiguration() {
+// setDefaultConfiguration will set the default configuration settings.
+func setDefaultConfiguration() {
 	viper.SetDefault("Address", "localhost")
 	viper.SetDefault("Port", "8080")
 	viper.SetDefault("ConfigPath", ConfigPath)
@@ -38,8 +38,8 @@ func InitializedConfiguration() {
 	flag.StringVar(&ConfigPath, "ConfigPath", ".", "Set the location of the config file.")
 	flag.Parse()
 
-	SetDefaultConfiguration()
+	setDefaultConfiguration()
 
-	LoadConfigFromFile()
+	loadConfigFromFile()
 	BasePath = viper.GetString("AbsoluteServePath")
 }

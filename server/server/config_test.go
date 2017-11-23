@@ -8,8 +8,7 @@ import (
 
 func TestLoadConfigFromFile(t *testing.T) {
 	// SetDefaultConfiguration must be called BEFORE LoadConfigFromFile.
-	SetDefaultConfiguration()
-	LoadConfigFromFile()
+	InitializedConfiguration()
 
 	Address := viper.GetString("Address")
 	if Address == "" {
