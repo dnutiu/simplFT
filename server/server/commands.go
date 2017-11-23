@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -10,6 +11,7 @@ import (
 )
 
 // GetFile sends the file to the client and returns true if it succeeds and false otherwise.
+// it also returns the total number of send bytes.
 func GetFile(c Client, path string) (int, error) {
 	fileName, sanitized := sanitizeFilePath(path)
 	if sanitized {
@@ -23,35 +25,29 @@ func GetFile(c Client, path string) (int, error) {
 
 	file, err := os.Open(MakePathFromStringStack(stack) + fileName)
 	if err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 		return 0, err
 	}
 	defer file.Close()
 
-	data, err := readFileData(file)
-	if err != nil {
-		return 0, err
+	var data = make([]byte, DataBufferSize, DataBufferSize)
+	totalSend := 0
+	for {
+		n, err := file.Read(data)
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return totalSend, err
+		}
+
+		totalSend += n
+		_, err = c.Connection().Write(data)
+		if err != nil {
+			return totalSend, err
+		}
 	}
 
-	n, err := c.Connection().Write(data)
-	if err != nil {
-		log.Println(err)
-		return 0, err
-	}
-	if n == 0 {
-		// This happens when the user ties to get the current directory
-		return 0, GetNoBitsError
-	}
-	return n, nil
-}
-
-func readFileData(file *os.File) ([]byte, error) {
-	data, err := ioutil.ReadAll(file)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	return data, nil
+	return totalSend, nil
 }
 
 func sanitizeFilePath(path string) (string, bool) {

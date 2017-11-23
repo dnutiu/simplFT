@@ -8,6 +8,11 @@ import (
 	"net"
 )
 
+// DataBufferSize the maximum size of the data buffer.
+// The data buffer is used at reading from files, the buffer
+// is also send to the client.
+const DataBufferSize = 1024 * 1024
+
 // Client interface provides the blueprints for the Client that is used by the server.
 type Client interface {
 	Connection() net.Conn        // Connection returns the connection stream.
