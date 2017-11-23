@@ -1,7 +1,6 @@
 package server
 
 import (
-	"io"
 	"strings"
 )
 
@@ -47,7 +46,6 @@ func ProcessInput(c Client, text string) error {
 		if err != nil {
 			return &InputError{thisCommand, err}
 		}
-		io.WriteString(c.Connection(), "\n\n")
 	case "ls":
 		err := checkArgumentsLength(commandsLen, 1)
 		if err != nil {
