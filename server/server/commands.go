@@ -18,12 +18,7 @@ func GetFile(c Client, path string) (int, error) {
 		return 0, ErrSlashNotAllowed
 	}
 
-	stack, ok := c.Stack().(*StringStack)
-	if !ok {
-		return 0, ErrStackCast
-	}
-
-	file, err := os.Open(MakePathFromStringStack(stack) + fileName)
+	file, err := os.Open(MakePathFromStringStack(c.Stack()) + fileName)
 	if err != nil {
 		log.Println(err.Error())
 		return 0, err
@@ -68,12 +63,8 @@ func sanitizeFilePath(path string) (string, bool) {
 
 // ListFiles list the files from path and sends them to the connection
 func ListFiles(c Client) error {
-	stack, ok := c.Stack().(*StringStack)
-	if !ok {
-		return ErrStackCast
-	}
 
-	files, err := ioutil.ReadDir(MakePathFromStringStack(stack))
+	files, err := ioutil.ReadDir(MakePathFromStringStack(c.Stack()))
 	if err != nil {
 		return err
 	}
@@ -110,17 +101,12 @@ func ChangeDirectoryCommand(c Client, directory string) error {
 		return ErrSlashNotAllowed
 	}
 
-	stack, ok := c.Stack().(*StringStack)
-	if !ok {
-		return ErrStackCast
-	}
-
 	if path == "." {
 		err = nil
 	} else if path == ".." {
-		err = ChangeDirectoryToPrevious(stack)
+		err = ChangeDirectoryToPrevious(c.Stack())
 	} else {
-		err = ChangeDirectory(stack, path)
+		err = ChangeDirectory(c.Stack(), path)
 	}
 
 	return err
