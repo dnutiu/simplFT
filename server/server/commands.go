@@ -2,13 +2,59 @@ package server
 
 import (
 	"bytes"
+	"image"
+	"image/color"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"strconv"
 	"strings"
+
+	_ "image/jpeg"
+	_ "image/png"
+	"reflect"
+
+	"github.com/nfnt/resize"
 )
+
+// SendAsciiPic sends an image as ascii text to the client.
+func SendAsciiPic(c Client, path string) error {
+	// From: https://github.com/stdupp/goasciiart/blob/master/goasciiart.go
+	var w = 80
+	f, err := os.Open(MakePathFromStringStack(c.Stack()) + path)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	img, _, err := image.Decode(f)
+	defer f.Close()
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	sz := img.Bounds()
+	h := (sz.Max.Y * w * 10) / (sz.Max.X * 16)
+	img = resize.Resize(uint(80), uint(h), img, resize.Lanczos3)
+
+	table := []byte("MND8OZ$7I?+=~:,..")
+	buf := new(bytes.Buffer)
+
+	for i := 0; i < h; i++ {
+		for j := 0; j < w; j++ {
+			g := color.GrayModel.Convert(img.At(j, i))
+			y := reflect.ValueOf(g).FieldByName("Y").Uint()
+			pos := int(y * 16 / 255)
+			buf.WriteByte(table[pos])
+		}
+		buf.WriteByte('\n')
+	}
+
+	_, err = c.Connection().Write(buf.Bytes())
+	return err
+}
 
 // GetFile sends the file to the client and returns true if it succeeds and false otherwise.
 // it also returns the total number of send bytes.
@@ -38,7 +84,7 @@ func GetFile(c Client, path string) (int, error) {
 		totalSend += n
 		_, err = c.Connection().Write(data)
 		if err != nil {
-			return totalSend, err
+			break
 		}
 	}
 
@@ -76,11 +122,7 @@ func ListFiles(c Client) error {
 	}
 
 	_, err = c.Connection().Write(buffer.Bytes())
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 // ClearScreen cleans the client's screen by sending clear to the terminal.
@@ -120,6 +162,7 @@ ls             - List the files in the current directory.
 cd             - Changes the directory.
 clear          - Clear the screen.
 exit           - Close the connection with the server.c
+pic            - Returns the ascii art of an image. :-)
 `
 	_, err := c.Connection().Write([]byte(helpText))
 

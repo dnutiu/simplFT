@@ -46,6 +46,17 @@ func ProcessInput(c Client, text string) error {
 		if err != nil {
 			return &InputError{thisCommand, err}
 		}
+	case "pic":
+		err := checkArgumentsLength(commandsLen, 2)
+		if err != nil {
+			return &InputError{thisCommand, err}
+		}
+
+		// Get the file
+		err = SendAsciiPic(c, commands[1])
+		if err != nil {
+			return &InputError{thisCommand, err}
+		}
 	case "ls":
 		err := checkArgumentsLength(commandsLen, 1)
 		if err != nil {
