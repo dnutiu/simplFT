@@ -39,8 +39,8 @@ func SendAsciiPic(c Client, path string) error {
 	h := (sz.Max.Y * w * 10) / (sz.Max.X * 16)
 	img = resize.Resize(uint(80), uint(h), img, resize.Lanczos3)
 
-	table := []byte("MND8OZ$7I?+=~:,..")
-	buf := new(bytes.Buffer)
+	var table = []byte("MND8OZ$7I?+=~:,..")
+	var buf bytes.Buffer
 
 	for i := 0; i < h; i++ {
 		for j := 0; j < w; j++ {
