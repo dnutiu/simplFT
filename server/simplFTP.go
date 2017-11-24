@@ -11,9 +11,9 @@ import (
 func main() {
 	server.InitializedConfiguration()
 
-	Addr := viper.GetString("Address")
-	Port := viper.GetString("Port")
-	DirDepth := viper.GetInt("MaxDirDepth")
+	Addr := viper.GetString("address")
+	Port := viper.GetString("port")
+	DirDepth := viper.GetInt("maxDirDepth")
 
 	// Start the server
 	listener, err := net.Listen("tcp", Addr+":"+Port)

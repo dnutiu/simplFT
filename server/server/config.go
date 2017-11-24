@@ -26,16 +26,16 @@ func loadConfigFromFile() error {
 
 // setDefaultConfiguration will set the default configuration settings.
 func setDefaultConfiguration() {
-	viper.SetDefault("Address", "localhost")
-	viper.SetDefault("Port", "8080")
-	viper.SetDefault("ConfigPath", ConfigPath)
-	viper.SetDefault("MaxDirDepth", 30)
-	viper.SetDefault("AbsoluteServePath", "./")
+	viper.SetDefault("address", "localhost")
+	viper.SetDefault("port", "8080")
+	viper.SetDefault("configPath", ConfigPath)
+	viper.SetDefault("maxDirDepth", 30)
+	viper.SetDefault("absoluteServePath", "./")
 }
 
 // InitializedConfiguration initializes the configuration for the application.
 func InitializedConfiguration() {
-	flag.StringVar(&ConfigPath, "ConfigPath", ".", "Set the location of the config file.")
+	flag.StringVar(&ConfigPath, "config", ".", "Set the location of the config file.")
 	flag.Parse()
 
 	setDefaultConfiguration()

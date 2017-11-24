@@ -14,10 +14,10 @@ If no configuration file is provided the server will run with the default settin
 Sample Configuration File:
 ```
 {
-    "Address": "localhost",
-    "Port": "8000",
-    "MaxDirDepth": 30,
-    "AbsoluteServePath": "./"
+    "address": "localhost",
+    "port": "8080",
+    "maxDirDepth": 30,
+    "absoluteServePath": "/Users/denis/Dropbox/Pictures/CuteAvatars"
 }
 ```
 
