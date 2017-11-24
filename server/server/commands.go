@@ -2,8 +2,6 @@ package server
 
 import (
 	"bytes"
-	"image"
-	"image/color"
 	"io"
 	"io/ioutil"
 	"log"
@@ -11,48 +9,31 @@ import (
 	"strconv"
 	"strings"
 
-	_ "image/jpeg"
-	_ "image/png"
-	"reflect"
-
-	"github.com/nfnt/resize"
+	"github.com/zyxar/image2ascii/ascii"
 )
 
 // SendAsciiPic sends an image as ascii text to the client.
 func SendAsciiPic(c Client, path string) error {
-	// From: https://github.com/stdupp/goasciiart/blob/master/goasciiart.go
-	var w = 80
 	f, err := os.Open(MakePathFromStringStack(c.Stack()) + path)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
-
-	img, _, err := image.Decode(f)
 	defer f.Close()
+	opt := ascii.Options{
+		Width:  0,
+		Height: 0,
+		Color:  false,
+		Invert: false,
+		Flipx:  false,
+		Flipy:  false}
+
+	a, err := ascii.Decode(f, opt)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
-
-	sz := img.Bounds()
-	h := (sz.Max.Y * w * 10) / (sz.Max.X * 16)
-	img = resize.Resize(uint(80), uint(h), img, resize.Lanczos3)
-
-	var table = []byte("MND8OZ$7I?+=~:,..")
-	var buf bytes.Buffer
-
-	for i := 0; i < h; i++ {
-		for j := 0; j < w; j++ {
-			g := color.GrayModel.Convert(img.At(j, i))
-			y := reflect.ValueOf(g).FieldByName("Y").Uint()
-			pos := int(y * 16 / 255)
-			buf.WriteByte(table[pos])
-		}
-		buf.WriteByte('\n')
-	}
-
-	_, err = c.Connection().Write(buf.Bytes())
+	_, err = a.WriteTo(c.Connection())
 	return err
 }
 
