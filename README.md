@@ -31,15 +31,15 @@ Sample Configuration File:
 
 The **config.json** file contains the following settings:
 
-address           - The address on which to serve
+1. address           - The address on which to serve
 
-port              - The port
+2. port              - The port
 
-maxDirDepth       - The maximum depth the user can go into directories. A value of 30 means the user can cd into max 30 dirs.
+3. maxDirDepth       - The maximum depth the user can go into directories. A value of 30 means the user can cd into max 30 dirs.
 
-absoluteServePath - The path from where to serve the files.
+4. absoluteServePath - The path from where to serve the files.
 
-pic               - The X and Y max size for the pic command. A value of 0 means original size
+5. pic               - The X and Y max size for the pic command. A value of 0 means original size
 
 If one of the settings are changed, the server will reload the configuration.
 Except for the absoluteServePath.
