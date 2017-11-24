@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/spf13/viper"
 	"github.com/zyxar/image2ascii/ascii"
 )
 
@@ -21,8 +22,8 @@ func SendAsciiPic(c Client, path string) error {
 	}
 	defer f.Close()
 	opt := ascii.Options{
-		Width:  0,
-		Height: 0,
+		Width:  viper.GetInt("pic.x"),
+		Height: viper.GetInt("pic.y"),
 		Color:  false,
 		Invert: false,
 		Flipx:  false,

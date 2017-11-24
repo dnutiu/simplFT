@@ -5,6 +5,10 @@ that I took in Fall 2017 at UPT.
 The scope of this project is to implement a simple server that handles multiple clients and allows the clients to
 execute commands on it.
 
+## Commands
+
+//todo
+
 ## Configuration
 
 The server can be configured via command line flags with the -ConfigPath option,
@@ -17,13 +21,25 @@ Sample Configuration File:
     "address": "localhost",
     "port": "8080",
     "maxDirDepth": 30,
-    "absoluteServePath": "/Users/denis/Dropbox/Pictures/CuteAvatars"
+    "absoluteServePath": "/Users/denis/Dropbox/Pictures/CuteAvatars",
+    "pic": {
+        "x": 0,
+        "y": 0
+    }
 }
 ```
 
 The **config.json** file contains the following settings:
 
-Address           - The address on which to serve
-Port              - The port
-MaxDirDepth       - The maximum depth the user can go into directories. A value of 30 means the user can cd into max 30 dirs.
-AbsoluteServePath - The path from where to serve the files.
+address           - The address on which to serve
+
+port              - The port
+
+maxDirDepth       - The maximum depth the user can go into directories. A value of 30 means the user can cd into max 30 dirs.
+
+absoluteServePath - The path from where to serve the files.
+
+pic               - The X and Y max size for the pic command. A value of 0 means original size
+
+If one of the settings are changed, the server will reload the configuration.
+Except for the absoluteServePath.

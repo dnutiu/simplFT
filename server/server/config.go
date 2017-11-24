@@ -6,6 +6,7 @@ import (
 
 	"flag"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 )
 
@@ -31,6 +32,8 @@ func setDefaultConfiguration() {
 	viper.SetDefault("configPath", ConfigPath)
 	viper.SetDefault("maxDirDepth", 30)
 	viper.SetDefault("absoluteServePath", "./")
+	viper.SetDefault("pic.x", 0)
+	viper.SetDefault("pic.y", 0)
 }
 
 // InitializedConfiguration initializes the configuration for the application.
@@ -39,7 +42,12 @@ func InitializedConfiguration() {
 	flag.Parse()
 
 	setDefaultConfiguration()
-
 	loadConfigFromFile()
-	BasePath = viper.GetString("AbsoluteServePath")
+
+	viper.WatchConfig()
+	viper.OnConfigChange(func(e fsnotify.Event) {
+		log.Println("Reloaded configuration file successfully!")
+	})
+
+	BasePath = viper.GetString("absoluteServePath")
 }
