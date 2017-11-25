@@ -23,6 +23,7 @@ Sample Configuration File:
     "maxDirDepth": 30,
     "absoluteServePath": "/Users/denis/Dropbox/Pictures/CuteAvatars",
     "pic": {
+        "color": false,
         "x": 0,
         "y": 0
     }

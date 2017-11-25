@@ -34,6 +34,7 @@ func setDefaultConfiguration() {
 	viper.SetDefault("absoluteServePath", "./")
 	viper.SetDefault("pic.x", 0)
 	viper.SetDefault("pic.y", 0)
+	viper.SetDefault("pic.color", false)
 }
 
 // InitializedConfiguration initializes the configuration for the application.

@@ -24,7 +24,7 @@ func SendAsciiPic(c Client, path string) error {
 	opt := ascii.Options{
 		Width:  viper.GetInt("pic.x"),
 		Height: viper.GetInt("pic.y"),
-		Color:  false,
+		Color:  viper.GetBool("pic.color"),
 		Invert: false,
 		Flipx:  false,
 		Flipy:  false}
