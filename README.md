@@ -7,7 +7,20 @@ execute commands on it.
 
 ## Commands
 
+The server accepts the following commands:
+
 //todo
+
+#### Sending commands via netcat
+
+To grab a file the following command can be send:
+
+```echo "get file.txt" | nc ip port > lfile.txt```
+
+If someone wishes to send multiple commands, the following syntax
+can be used:
+
+```(echo "get file1.txt" & echo "get file2.txt") | nc ip port > concatenated.txt```
 
 ## Configuration
 
