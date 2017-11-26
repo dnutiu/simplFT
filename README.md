@@ -11,6 +11,12 @@ The server accepts the following commands:
 
 //todo
 
+#### The upload server
+
+If the upload server is running, the user will be able to put files
+on the **absoluteServePath**. After the file is uploaded successfully,
+if the timeout is not reached, the user will get back the filename.
+
 #### Sending commands via netcat
 
 To grab a file the following command can be send:
@@ -32,13 +38,19 @@ Sample Configuration File:
 ```
 {
     "address": "localhost",
-    "port": "8080",
+    "port": 8080,
     "maxDirDepth": 30,
     "absoluteServePath": "/Users/denis/Dropbox/Pictures/CuteAvatars",
     "pic": {
-        "color": false,
-        "x": 0,
-        "y": 0
+        "color": true,
+        "x": 197,
+        "y": 50
+    },
+    "upload": {
+        "enabled": false,
+        "timeout": 5,
+        "address": "localhost",
+        "port": 8081
     }
 }
 ```
@@ -53,7 +65,8 @@ The **config.json** file contains the following settings:
 
 4. absoluteServePath - The path from where to serve the files.
 
-5. pic               - The X and Y max size for the pic command. A value of 0 means original size
+5. pic               - The X and Y max size for the pic command. A value of 0 means original size.
 
+6. upload            - Settings for the upload server.
 If one of the settings are changed, the server will reload the configuration.
 Except for the absoluteServePath.

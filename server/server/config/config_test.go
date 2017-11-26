@@ -8,15 +8,15 @@ import (
 
 func TestLoadConfigFromFile(t *testing.T) {
 	// SetDefaultConfiguration must be called BEFORE LoadConfigFromFile.
-	InitializedConfiguration()
+	InitializeConfiguration()
 
 	Address := viper.GetString("address")
 	if Address == "" {
 		t.Error("TestLoadConfigFromFile: Can't get Address!")
 	}
 
-	Port := viper.GetString("port")
-	if Port == "" {
+	Port := viper.GetInt("port")
+	if Port == 0 {
 		t.Error("TestLoadConfigFromFile: Can't get Port!")
 	}
 

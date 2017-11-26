@@ -88,18 +88,21 @@ func HandleConnection(client Client) {
 	log.Println(client.Connection().RemoteAddr(), "has disconnected.")
 }
 
-func StartFtpServer() {
-	config.InitializedConfiguration(func(e fsnotify.Event) {
-		log.Println("Configuration reloaded!")
+func Init() {
+	config.InitializeConfiguration()
+	config.ConfigChangeCallback(func(event fsnotify.Event) {
+		log.Println("Configuration reloaded successfully!")
 	})
+}
 
+func StartFtpServer() {
 	Addr := viper.GetString("address")
-	Port := viper.GetString("port")
+	Port := viper.GetInt("port")
 	DirDepth := viper.GetInt("maxDirDepth")
 	BasePath = viper.GetString("absoluteServePath")
 
 	// Start the server
-	listener, err := net.Listen("tcp", Addr+":"+Port)
+	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", Addr, Port))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -120,5 +123,47 @@ func StartFtpServer() {
 		client.SetConnection(conn)
 
 		go HandleConnection(&client)
+	}
+}
+
+func StartUploadServer() {
+	if viper.GetBool("upload.enabled") == false {
+		log.Println("Uploading not enabled. To enable modify the config file and restart the server")
+		return
+	}
+
+	Addr := viper.GetString("upload.address")
+	Port := viper.GetInt("upload.port")
+
+	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", Addr, Port))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Upload server running on:", Addr, "port", Port)
+
+	for {
+
+		conn, err := listener.Accept()
+		if err != nil {
+			log.Print(err)
+			continue
+		}
+
+		client := FTPClient{}
+		client.SetStack(MakeStringStack(1))
+		client.SetConnection(conn)
+
+		log.Println(conn.RemoteAddr().String() + " is uploading something.")
+
+		filename, err := UploadFile(&client)
+		if err == nil {
+			io.WriteString(conn, filename)
+		} else {
+			log.Print(conn.RemoteAddr().String())
+			log.Println(err)
+		}
+
+		log.Println(conn.RemoteAddr().String() + "'s upload finished.")
 	}
 }

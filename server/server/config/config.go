@@ -28,17 +28,20 @@ func loadConfigFromFile() error {
 // setDefaultConfiguration will set the default configuration settings.
 func setDefaultConfiguration() {
 	viper.SetDefault("address", "localhost")
-	viper.SetDefault("port", "8080")
+	viper.SetDefault("port", 8080)
 	viper.SetDefault("configPath", ConfigPath)
 	viper.SetDefault("maxDirDepth", 30)
 	viper.SetDefault("absoluteServePath", "./")
 	viper.SetDefault("pic.x", 0)
 	viper.SetDefault("pic.y", 0)
 	viper.SetDefault("pic.color", false)
+	viper.SetDefault("upload.enabled", false)
+	viper.SetDefault("upload.address", "localhost")
+	viper.SetDefault("upload.port", 8081)
 }
 
-// InitializedConfiguration initializes the configuration for the application.
-func InitializedConfiguration(callback func(e fsnotify.Event)) {
+// InitializeConfiguration initializes the configuration for the application.
+func InitializeConfiguration() {
 	flag.StringVar(&ConfigPath, "config", ".", "Set the location of the config file.")
 	flag.Parse()
 
@@ -46,5 +49,8 @@ func InitializedConfiguration(callback func(e fsnotify.Event)) {
 	loadConfigFromFile()
 
 	viper.WatchConfig()
-	viper.OnConfigChange(callback)
+}
+
+func ConfigChangeCallback(cb func(event fsnotify.Event)) {
+	viper.OnConfigChange(cb)
 }

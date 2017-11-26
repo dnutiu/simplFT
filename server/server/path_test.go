@@ -14,6 +14,8 @@ func TestMakePathFromStringStack(t *testing.T) {
 	st.Push("folder two")
 	st.Push("trinity")
 
+	BasePath = "./"
+
 	path := MakePathFromStringStack(st)
 	expected := fmt.Sprintf("%s%s/%s/%s/", BasePath, "first", "folder two", "trinity")
 

@@ -5,5 +5,8 @@ import (
 )
 
 func main() {
+	server.Init()
+
+	go server.StartUploadServer()
 	server.StartFtpServer()
 }
