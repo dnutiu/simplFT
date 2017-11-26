@@ -53,7 +53,7 @@ func UploadFile(c Client) (string, error) {
 			log.Println(c.Connection().RemoteAddr().String() + " has reached timeout!")
 			break
 		}
-		f.WriteString(input.Text() + "\n")
+		f.Write(input.Bytes())
 	}
 
 	return filename, nil
