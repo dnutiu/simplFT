@@ -6,6 +6,8 @@ import (
 	"io"
 	"log"
 	"net"
+
+	"github.com/spf13/viper"
 )
 
 // DataBufferSize the maximum size of the data buffer.
@@ -82,4 +84,36 @@ func HandleConnection(client Client) {
 
 	// Client has left.
 	log.Println(client.Connection().RemoteAddr(), "has disconnected.")
+}
+
+func StartFtpServer() {
+	InitializedConfiguration()
+
+	Addr := viper.GetString("address")
+	Port := viper.GetString("port")
+	DirDepth := viper.GetInt("maxDirDepth")
+
+	// Start the server
+	listener, err := net.Listen("tcp", Addr+":"+Port)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Hello world!")
+	log.Println("Ftp server running on:", Addr, "port", Port)
+
+	for {
+
+		conn, err := listener.Accept()
+		if err != nil {
+			log.Print(err)
+			continue
+		}
+
+		client := FTPClient{}
+		client.SetStack(MakeStringStack(DirDepth))
+		client.SetConnection(conn)
+
+		go HandleConnection(&client)
+	}
 }
