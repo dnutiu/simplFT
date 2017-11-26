@@ -7,6 +7,8 @@ import (
 	"log"
 	"net"
 
+	"github.com/fsnotify/fsnotify"
+	"github.com/metonimie/simpleFTP/server/server/config"
 	"github.com/spf13/viper"
 )
 
@@ -87,11 +89,14 @@ func HandleConnection(client Client) {
 }
 
 func StartFtpServer() {
-	InitializedConfiguration()
+	config.InitializedConfiguration(func(e fsnotify.Event) {
+		log.Println("Configuration reloaded!")
+	})
 
 	Addr := viper.GetString("address")
 	Port := viper.GetString("port")
 	DirDepth := viper.GetInt("maxDirDepth")
+	BasePath = viper.GetString("absoluteServePath")
 
 	// Start the server
 	listener, err := net.Listen("tcp", Addr+":"+Port)

@@ -1,5 +1,5 @@
 // This file contains the configuration settings for the server.
-package server
+package config
 
 import (
 	"log"
@@ -38,7 +38,7 @@ func setDefaultConfiguration() {
 }
 
 // InitializedConfiguration initializes the configuration for the application.
-func InitializedConfiguration() {
+func InitializedConfiguration(callback func(e fsnotify.Event)) {
 	flag.StringVar(&ConfigPath, "config", ".", "Set the location of the config file.")
 	flag.Parse()
 
@@ -46,9 +46,5 @@ func InitializedConfiguration() {
 	loadConfigFromFile()
 
 	viper.WatchConfig()
-	viper.OnConfigChange(func(e fsnotify.Event) {
-		log.Println("Reloaded configuration file successfully!")
-	})
-
-	BasePath = viper.GetString("absoluteServePath")
+	viper.OnConfigChange(callback)
 }
