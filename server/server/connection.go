@@ -7,6 +7,10 @@ import (
 	"log"
 	"net"
 
+	"os"
+
+	"time"
+
 	"github.com/fsnotify/fsnotify"
 	"github.com/metonimie/simpleFTP/server/server/config"
 	"github.com/spf13/viper"
@@ -17,12 +21,26 @@ import (
 // is also send to the client.
 const DataBufferSize = 1024 * 1024
 
+// ConfigPath is used by the config package to find the config file.
+var ConfigPath string
+
+// uploadDirectory is the directory where the files will be uploaded
+var uploadDirectory string
+
+// uploadTimeout is the amount in seconds the server will wait for a file to be uploaded
+var uploadTimeout time.Duration
+
 // Client interface provides the blueprints for the Client that is used by the server.
 type Client interface {
 	Connection() net.Conn        // Connection returns the connection stream.
 	SetConnection(conn net.Conn) // SetConnection sets the connection for the client.
 	Disconnect()                 // Disconnect closes the Client's connections and clears up resources.
 	Stack() *StringStack         // Returns the underlying String Stack.
+}
+
+type UploadResult struct {
+	Filename string // Filename represents the file which was randomly created by the server
+	Err      error  // Err is the error that occurred while uploading the file.
 }
 
 // FTPClient represents a FTPClient connection, it holds a root cage and the underlying connection.
@@ -89,8 +107,8 @@ func HandleConnection(client Client) {
 }
 
 func Init() {
-	config.InitializeConfiguration()
-	config.ConfigChangeCallback(func(event fsnotify.Event) {
+	config.InitializeConfiguration("config", ConfigPath)
+	config.ChangeCallback(func(event fsnotify.Event) {
 		log.Println("Configuration reloaded successfully!")
 	})
 }
@@ -126,44 +144,101 @@ func StartFtpServer() {
 	}
 }
 
-func StartUploadServer() {
+func HandleUpload(conn net.Conn) {
+	// Initialize Client
+	client := FTPClient{}
+	client.SetStack(MakeStringStack(2))
+
+	// Upload directory
+	client.Stack().Push(uploadDirectory)
+	client.SetConnection(conn)
+
+	// Create the file on the disk and make sure that the filename is random.
+	var filename = randSeq(10)
+	var _, err = os.Stat(MakePathFromStringStack(client.Stack()) + filename)
+
+	for !os.IsNotExist(err) {
+		filename = randSeq(10)
+		_, err = os.Stat(MakePathFromStringStack(client.Stack()) + filename)
+	}
+
+	// This channel will be used to store the uploadResult
+	c1 := make(chan UploadResult, 1)
+	log.Println(conn.RemoteAddr().String() + " is uploading something.")
+
+	// Create a new Go routine for uploading
+	go func() {
+		fname, err := UploadFile(&client, filename)
+		c1 <- UploadResult{fname, err}
+	}()
+
+	// Wait for either UploadResult or Timeout
+	select {
+	case result := <-c1:
+		{
+			filename, err := result.Filename, result.Err
+
+			if err == nil {
+				io.WriteString(conn, filename)
+				log.Println(conn.RemoteAddr().String() + "'s upload finished.")
+			} else {
+				log.Println(fmt.Sprintf("%s: %s %s", "HandleUpload", conn.RemoteAddr().String(), err.Error()))
+
+				client.Stack().Push(filename)
+				os.Remove(MakePathFromStringStack(client.Stack()))
+
+				io.WriteString(conn, err.Error())
+			}
+
+			conn.Close()
+		}
+	case <-time.After(time.Second * uploadTimeout):
+		{
+			io.WriteString(conn, "Timeout")
+			conn.Close()
+		}
+	}
+}
+
+// StartUploadServer starts the uploading server
+func StartUploadServer() error {
 	if viper.GetBool("upload.enabled") == false {
 		log.Println("Uploading not enabled. To enable modify the config file and restart the server")
-		return
+		return ErrUploadServerFailure
 	}
 
-	Addr := viper.GetString("upload.address")
-	Port := viper.GetInt("upload.port")
+	addr := viper.GetString("upload.address")
+	port := viper.GetInt("upload.port")
+	uploadDirectory = viper.GetString("upload.directory")
+	uploadTimeout = time.Duration(viper.GetInt("upload.timeout"))
 
-	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", Addr, Port))
+	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", addr, port))
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return ErrUploadServerFailure
 	}
 
-	log.Println("Upload server running on:", Addr, "port", Port)
+	err = os.Mkdir(uploadDirectory, 0740)
+	if err != nil {
+		if _, err := os.Stat(uploadDirectory); err != nil {
+			if os.IsNotExist(err) {
+				log.Println("Can't create upload directory!")
+				return ErrUploadServerFailure
+			}
+		}
+	}
+
+	log.Println("Upload server running on:", addr, "port", port)
 
 	for {
-
 		conn, err := listener.Accept()
 		if err != nil {
 			log.Print(err)
 			continue
 		}
 
-		client := FTPClient{}
-		client.SetStack(MakeStringStack(1))
-		client.SetConnection(conn)
-
-		log.Println(conn.RemoteAddr().String() + " is uploading something.")
-
-		filename, err := UploadFile(&client)
-		if err == nil {
-			io.WriteString(conn, filename)
-		} else {
-			log.Print(conn.RemoteAddr().String())
-			log.Println(err)
-		}
-
-		log.Println(conn.RemoteAddr().String() + "'s upload finished.")
+		go HandleUpload(conn)
 	}
+
+	return nil
 }

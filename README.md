@@ -17,6 +17,11 @@ If the upload server is running, the user will be able to put files
 on the **absoluteServePath**. After the file is uploaded successfully,
 if the timeout is not reached, the user will get back the filename.
 
+To send data to the upload server, the following command can be used:
+
+```nc ip port < gopher.png```
+
+
 #### Sending commands via netcat
 
 To grab a file the following command can be send:
@@ -48,6 +53,7 @@ Sample Configuration File:
     },
     "upload": {
         "enabled": false,
+        "directory": "upload",
         "timeout": 5,
         "address": "localhost",
         "port": 8081

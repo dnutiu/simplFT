@@ -52,3 +52,8 @@ var (
 	ErrAlreadyAtBaseDirectory = PathError{errors.New("can't go past beyond root directory")}
 	ErrSlashNotAllowed        = PathError{errors.New("slash is not allowed in file names")}
 )
+
+// General Errors
+var (
+	ErrUploadServerFailure = errors.New("upload server failed to start")
+)

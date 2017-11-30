@@ -10,9 +10,6 @@ import (
 	"strconv"
 	"strings"
 
-	"bufio"
-	"time"
-
 	"github.com/spf13/viper"
 	"github.com/zyxar/image2ascii/ascii"
 )
@@ -27,34 +24,14 @@ func randSeq(n int) string {
 }
 
 // UploadFile uploads a file to the server
-func UploadFile(c Client) (string, error) {
-
-	input := bufio.NewScanner(c.Connection())
-	start := time.Now()
-	timeout := time.Duration(viper.GetInt("upload.timeout")) * time.Second
-
-	var filename = randSeq(10)
-	var _, err = os.Stat(MakePathFromStringStack(c.Stack()) + filename)
-
-	// Make sure that the filename is random.
-	for !os.IsNotExist(err) {
-		filename = randSeq(10)
-		_, err = os.Stat(MakePathFromStringStack(c.Stack()) + filename)
-	}
-
+func UploadFile(c Client, filename string) (string, error) {
 	f, err := os.Create(MakePathFromStringStack(c.Stack()) + filename)
 	if err != nil {
 		return filename, err
 	}
 	defer f.Close()
 
-	for input.Scan() {
-		if time.Since(start) >= timeout {
-			log.Println(c.Connection().RemoteAddr().String() + " has reached timeout!")
-			break
-		}
-		f.Write(input.Bytes())
-	}
+	io.Copy(f, c.Connection())
 
 	return filename, nil
 }

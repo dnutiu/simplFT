@@ -4,18 +4,13 @@ package config
 import (
 	"log"
 
-	"flag"
-
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 )
 
-// ConfigPath will be used via cmd to set the configuration path for the config file.
-var ConfigPath string
-
 // loadConfigFromFile tries to load the configuration file from the disk.
-func loadConfigFromFile() error {
-	viper.SetConfigName("config")
+func loadConfigFromFile(configName string) error {
+	viper.SetConfigName(configName)
 	viper.AddConfigPath(viper.GetString("ConfigPath"))
 
 	err := viper.ReadInConfig() // Find and read the config file
@@ -26,31 +21,30 @@ func loadConfigFromFile() error {
 }
 
 // setDefaultConfiguration will set the default configuration settings.
-func setDefaultConfiguration() {
+func setDefaultConfiguration(configPath string) {
 	viper.SetDefault("address", "localhost")
 	viper.SetDefault("port", 8080)
-	viper.SetDefault("configPath", ConfigPath)
+	viper.SetDefault("configPath", configPath)
 	viper.SetDefault("maxDirDepth", 30)
 	viper.SetDefault("absoluteServePath", "./")
 	viper.SetDefault("pic.x", 0)
 	viper.SetDefault("pic.y", 0)
 	viper.SetDefault("pic.color", false)
 	viper.SetDefault("upload.enabled", false)
+	viper.SetDefault("upload.directory", "upload")
+	viper.SetDefault("upload.timeout", 3)
 	viper.SetDefault("upload.address", "localhost")
 	viper.SetDefault("upload.port", 8081)
 }
 
 // InitializeConfiguration initializes the configuration for the application.
-func InitializeConfiguration() {
-	flag.StringVar(&ConfigPath, "config", ".", "Set the location of the config file.")
-	flag.Parse()
-
-	setDefaultConfiguration()
-	loadConfigFromFile()
+func InitializeConfiguration(configName string, configPath string) {
+	setDefaultConfiguration(configPath)
+	loadConfigFromFile(configName)
 
 	viper.WatchConfig()
 }
 
-func ConfigChangeCallback(cb func(event fsnotify.Event)) {
+func ChangeCallback(cb func(event fsnotify.Event)) {
 	viper.OnConfigChange(cb)
 }
