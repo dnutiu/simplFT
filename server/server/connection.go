@@ -38,11 +38,6 @@ type Client interface {
 	Stack() *StringStack         // Returns the underlying String Stack.
 }
 
-type UploadResult struct {
-	Filename string // Filename represents the file which was randomly created by the server
-	Err      error  // Err is the error that occurred while uploading the file.
-}
-
 // FTPClient represents a FTPClient connection, it holds a root cage and the underlying connection.
 type FTPClient struct {
 	rootCage   *StringStack // rootCage is a StringStack that is used to represent the current directory the client is in.
@@ -163,31 +158,29 @@ func HandleUpload(conn net.Conn) {
 	}
 
 	// This channel will be used to store the uploadResult
-	c1 := make(chan UploadResult, 1)
+	c1 := make(chan error, 1)
 	log.Println(conn.RemoteAddr().String() + " is uploading something.")
 
 	// Create a new Go routine for uploading
 	go func() {
-		fname, err := UploadFile(&client, filename)
-		c1 <- UploadResult{fname, err}
+		err := UploadFile(&client, filename)
+		c1 <- err
 	}()
 
 	// Wait for either UploadResult or Timeout
 	select {
 	case result := <-c1:
 		{
-			filename, err := result.Filename, result.Err
-
-			if err == nil {
+			if result == nil {
 				io.WriteString(conn, filename)
 				log.Println(conn.RemoteAddr().String() + "'s upload finished.")
 			} else {
-				log.Println(fmt.Sprintf("%s: %s %s", "HandleUpload", conn.RemoteAddr().String(), err.Error()))
+				log.Println(fmt.Sprintf("%s: %s %s", "HandleUpload", conn.RemoteAddr().String(), result.Error()))
 
 				client.Stack().Push(filename)
 				os.Remove(MakePathFromStringStack(client.Stack()))
 
-				io.WriteString(conn, err.Error())
+				io.WriteString(conn, result.Error())
 			}
 
 			conn.Close()

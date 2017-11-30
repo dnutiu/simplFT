@@ -24,16 +24,16 @@ func randSeq(n int) string {
 }
 
 // UploadFile uploads a file to the server
-func UploadFile(c Client, filename string) (string, error) {
+func UploadFile(c Client, filename string) error {
 	f, err := os.Create(MakePathFromStringStack(c.Stack()) + filename)
 	if err != nil {
-		return filename, err
+		return err
 	}
 	defer f.Close()
 
 	io.Copy(f, c.Connection())
 
-	return filename, nil
+	return nil
 }
 
 // SendAsciiPic sends an image as ascii text to the client.
