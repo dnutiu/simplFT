@@ -14,6 +14,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"sync"
+
 	"github.com/fsnotify/fsnotify"
 	"github.com/metonimie/simpleFTP/server/server/config"
 	"github.com/spf13/viper"
@@ -35,9 +37,14 @@ var uploadTimeout time.Duration
 
 // Shutdown is the shutdown where SIGINT and SIGTERM is send too
 var Shutdown = make(chan os.Signal, 1)
+var ftpShutdown = make(chan struct{}, 1)
+var uploadShutdown = make(chan struct{}, 1)
 
 var uploadListener net.Listener
 var ftpListener net.Listener
+
+// All connected clients
+var clients map[Client]bool
 
 // Client interface provides the blueprints for the Client that is used by the server.
 type Client interface {
@@ -83,23 +90,43 @@ func shutdownHandler() {
 		select {
 		case <-Shutdown:
 			log.Println("Shutdown signal received")
-			if ftpListener != nil {
-				ftpListener.Close()
-			}
-			if uploadListener != nil {
-				uploadListener.Close()
-			}
+			var wg sync.WaitGroup
+			wg.Add(1)
 
-			// FIXME: Find a way to close all clients before this
-			os.Exit(0)
+			go func() { // Disconnect all the clients.
+				for k := range clients {
+					k.Disconnect()
+				}
+				wg.Done()
+			}()
+			wg.Wait()
+
+			ShutdownFtpServer()
+			ShutdownUploadServer()
+
 			return
 		}
+	}
+}
+
+func ShutdownUploadServer() {
+	if uploadListener != nil {
+		uploadListener.Close()
+		uploadShutdown <- struct{}{}
+	}
+}
+
+func ShutdownFtpServer() {
+	if ftpListener != nil {
+		ftpListener.Close()
+		ftpShutdown <- struct{}{}
 	}
 }
 
 func Init() {
 	signal.Notify(Shutdown, syscall.SIGINT, syscall.SIGTERM)
 
+	clients = make(map[Client]bool)
 	go shutdownHandler()
 
 	config.InitializeConfiguration("config", ConfigPath)
@@ -122,6 +149,7 @@ func HandleConnection(client Client) {
 	}()
 
 	log.Println(client.Connection().RemoteAddr(), "has connected.")
+	clients[client] = true
 
 	// Process input
 	input := bufio.NewScanner(client.Connection())
@@ -137,6 +165,7 @@ func HandleConnection(client Client) {
 	}
 
 	// Client has left.
+	delete(clients, client)
 	log.Println(client.Connection().RemoteAddr(), "has disconnected.")
 }
 
@@ -159,6 +188,14 @@ func StartFtpServer() error {
 	log.Println("Ftp server running on:", Addr, "port", Port)
 
 	for {
+		// Handle shutdown
+		select {
+		case <-ftpShutdown:
+			return nil
+		default:
+			// move on
+		}
+
 		conn, err := ftpListener.Accept()
 		if err != nil {
 			log.Print(err)
@@ -182,6 +219,7 @@ func HandleUpload(conn net.Conn) {
 	// Upload directory
 	client.Stack().Push(uploadDirectory)
 	client.SetConnection(conn)
+	defer client.Disconnect()
 
 	// Create the file on the disk and make sure that the filename is random.
 	var filename = randSeq(10)
@@ -195,6 +233,7 @@ func HandleUpload(conn net.Conn) {
 	// This channel will be used to store the uploadResult
 	c1 := make(chan error, 1)
 	log.Println(conn.RemoteAddr().String() + " is uploading something.")
+	clients[&client] = true
 
 	// Create a new Go routine for uploading
 	go func() {
@@ -226,6 +265,8 @@ func HandleUpload(conn net.Conn) {
 			conn.Close()
 		}
 	}
+
+	delete(clients, &client)
 }
 
 // StartUploadServer starts the uploading server
@@ -260,6 +301,14 @@ func StartUploadServer() error {
 	log.Println("Upload server running on:", addr, "port", port)
 
 	for {
+		// Handle shutdown
+		select {
+		case <-uploadShutdown:
+			return nil
+		default:
+			// move on
+		}
+
 		conn, err := uploadListener.Accept()
 		if err != nil {
 			log.Print(err)
