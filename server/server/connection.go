@@ -11,6 +11,9 @@ import (
 
 	"time"
 
+	"os/signal"
+	"syscall"
+
 	"github.com/fsnotify/fsnotify"
 	"github.com/metonimie/simpleFTP/server/server/config"
 	"github.com/spf13/viper"
@@ -29,6 +32,12 @@ var uploadDirectory string
 
 // uploadTimeout is the amount in seconds the server will wait for a file to be uploaded
 var uploadTimeout time.Duration
+
+// Shutdown is the shutdown where SIGINT and SIGTERM is send too
+var Shutdown = make(chan os.Signal, 1)
+
+var uploadListener net.Listener
+var ftpListener net.Listener
 
 // Client interface provides the blueprints for the Client that is used by the server.
 type Client interface {
@@ -69,6 +78,36 @@ func (c *FTPClient) Disconnect() {
 	c.connection.Close()
 }
 
+func shutdownHandler() {
+	for {
+		select {
+		case <-Shutdown:
+			log.Println("Shutdown signal received")
+			if ftpListener != nil {
+				ftpListener.Close()
+			}
+			if uploadListener != nil {
+				uploadListener.Close()
+			}
+
+			// FIXME: Find a way to close all clients before this
+			os.Exit(0)
+			return
+		}
+	}
+}
+
+func Init() {
+	signal.Notify(Shutdown, syscall.SIGINT, syscall.SIGTERM)
+
+	go shutdownHandler()
+
+	config.InitializeConfiguration("config", ConfigPath)
+	config.ChangeCallback(func(event fsnotify.Event) {
+		log.Println("Configuration reloaded successfully!")
+	})
+}
+
 func HandleConnection(client Client) {
 	defer client.Disconnect()
 	defer func() {
@@ -101,31 +140,26 @@ func HandleConnection(client Client) {
 	log.Println(client.Connection().RemoteAddr(), "has disconnected.")
 }
 
-func Init() {
-	config.InitializeConfiguration("config", ConfigPath)
-	config.ChangeCallback(func(event fsnotify.Event) {
-		log.Println("Configuration reloaded successfully!")
-	})
-}
-
-func StartFtpServer() {
+func StartFtpServer() error {
 	Addr := viper.GetString("address")
 	Port := viper.GetInt("port")
 	DirDepth := viper.GetInt("maxDirDepth")
 	BasePath = viper.GetString("absoluteServePath")
 
 	// Start the server
-	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", Addr, Port))
+	var err error
+	ftpListener, err = net.Listen("tcp", fmt.Sprintf("%s:%d", Addr, Port))
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
+	defer ftpListener.Close()
 
 	log.Println("Hello world!")
 	log.Println("Ftp server running on:", Addr, "port", Port)
 
 	for {
-
-		conn, err := listener.Accept()
+		conn, err := ftpListener.Accept()
 		if err != nil {
 			log.Print(err)
 			continue
@@ -137,6 +171,7 @@ func StartFtpServer() {
 
 		go HandleConnection(&client)
 	}
+	return nil
 }
 
 func HandleUpload(conn net.Conn) {
@@ -205,18 +240,19 @@ func StartUploadServer() error {
 	uploadDirectory = viper.GetString("upload.directory")
 	uploadTimeout = time.Duration(viper.GetInt("upload.timeout"))
 
-	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", addr, port))
+	uploadListener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", addr, port))
 	if err != nil {
 		log.Println(err)
-		return ErrUploadServerFailure
+		return err
 	}
+	defer uploadListener.Close()
 
 	err = os.Mkdir(uploadDirectory, 0740)
 	if err != nil {
 		if _, err := os.Stat(uploadDirectory); err != nil {
 			if os.IsNotExist(err) {
 				log.Println("Can't create upload directory!")
-				return ErrUploadServerFailure
+				return err
 			}
 		}
 	}
@@ -224,7 +260,7 @@ func StartUploadServer() error {
 	log.Println("Upload server running on:", addr, "port", port)
 
 	for {
-		conn, err := listener.Accept()
+		conn, err := uploadListener.Accept()
 		if err != nil {
 			log.Print(err)
 			continue
