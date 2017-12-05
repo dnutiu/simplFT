@@ -9,7 +9,15 @@ execute commands on it.
 
 The server accepts the following commands:
 
-//todo
+```
+The available commands are:
+get <filename> - Download the requested filename.
+ls             - List the files in the current directory.
+cd             - Changes the directory.
+clear          - Clear the screen.
+exit           - Close the connection with the server.c
+pic            - Returns the ascii art of an image. :-)
+```
 
 #### The upload server
 
