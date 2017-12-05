@@ -10,7 +10,6 @@ execute commands on it.
 The server accepts the following commands:
 
 ```
-The available commands are:
 get <filename> - Download the requested filename.
 ls             - List the files in the current directory.
 cd             - Changes the directory.
@@ -18,17 +17,6 @@ clear          - Clear the screen.
 exit           - Close the connection with the server.c
 pic            - Returns the ascii art of an image. :-)
 ```
-
-#### The upload server
-
-If the upload server is running, the user will be able to put files
-on the **absoluteServePath**. After the file is uploaded successfully,
-if the timeout is not reached, the user will get back the filename.
-
-To send data to the upload server, the following command can be used:
-
-```nc ip port < gopher.png```
-
 
 #### Sending commands via netcat
 
@@ -40,6 +28,16 @@ If someone wishes to send multiple commands, the following syntax
 can be used:
 
 ```(echo "get file1.txt" & echo "get file2.txt") | nc ip port > concatenated.txt```
+
+#### The upload server
+
+If the upload server is running, the user will be able to put files
+on the **absoluteServePath**. After the file is uploaded successfully,
+if the timeout is not reached, the user will get back the filename.
+
+To send data to the upload server, the following command can be used:
+
+```nc ip port < gopher.png```
 
 ## Configuration
 
