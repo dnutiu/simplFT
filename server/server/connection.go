@@ -101,9 +101,8 @@ func shutdownHandler() {
 			}()
 			wg.Wait()
 
-			ShutdownFtpServer()
-			ShutdownUploadServer()
-
+			go ShutdownFtpServer()
+			go ShutdownUploadServer()
 			return
 		}
 	}
@@ -112,15 +111,15 @@ func shutdownHandler() {
 func ShutdownUploadServer() {
 	if uploadListener != nil {
 		uploadListener.Close()
-		uploadShutdown <- struct{}{}
 	}
+	uploadShutdown <- struct{}{}
 }
 
 func ShutdownFtpServer() {
 	if ftpListener != nil {
 		ftpListener.Close()
-		ftpShutdown <- struct{}{}
 	}
+	ftpShutdown <- struct{}{}
 }
 
 func Init() {
@@ -169,7 +168,8 @@ func HandleConnection(client Client) {
 	log.Println(client.Connection().RemoteAddr(), "has disconnected.")
 }
 
-func StartFtpServer() error {
+func StartFtpServer(wg *sync.WaitGroup) error {
+	defer wg.Done()
 	Addr := viper.GetString("address")
 	Port := viper.GetInt("port")
 	DirDepth := viper.GetInt("maxDirDepth")
@@ -188,26 +188,27 @@ func StartFtpServer() error {
 	log.Println("Ftp server running on:", Addr, "port", Port)
 
 	for {
+		conn, err := ftpListener.Accept()
+
 		// Handle shutdown
 		select {
 		case <-ftpShutdown:
-			return nil
+			goto exit
 		default:
-			// move on
+			if err != nil {
+				log.Print(err)
+				continue
+			}
+
+			client := FTPClient{}
+			client.SetStack(MakeStringStack(DirDepth))
+			client.SetConnection(conn)
+
+			go HandleConnection(&client)
 		}
-
-		conn, err := ftpListener.Accept()
-		if err != nil {
-			log.Print(err)
-			continue
-		}
-
-		client := FTPClient{}
-		client.SetStack(MakeStringStack(DirDepth))
-		client.SetConnection(conn)
-
-		go HandleConnection(&client)
 	}
+exit:
+	log.Println("Ftp server exited.")
 	return nil
 }
 
@@ -270,7 +271,9 @@ func HandleUpload(conn net.Conn) {
 }
 
 // StartUploadServer starts the uploading server
-func StartUploadServer() error {
+func StartUploadServer(wg *sync.WaitGroup) error {
+	defer wg.Done()
+	var err error
 	if viper.GetBool("upload.enabled") == false {
 		log.Println("Uploading not enabled. To enable modify the config file and restart the server")
 		return ErrUploadServerFailure
@@ -281,7 +284,7 @@ func StartUploadServer() error {
 	uploadDirectory = viper.GetString("upload.directory")
 	uploadTimeout = time.Duration(viper.GetInt("upload.timeout"))
 
-	uploadListener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", addr, port))
+	uploadListener, err = net.Listen("tcp", fmt.Sprintf("%s:%d", addr, port))
 	if err != nil {
 		log.Println(err)
 		return err
@@ -301,22 +304,22 @@ func StartUploadServer() error {
 	log.Println("Upload server running on:", addr, "port", port)
 
 	for {
+		conn, err := uploadListener.Accept()
 		// Handle shutdown
 		select {
 		case <-uploadShutdown:
-			return nil
+			goto exit
 		default:
-			// move on
-		}
+			if err != nil {
+				log.Print(err)
+				continue
+			}
 
-		conn, err := uploadListener.Accept()
-		if err != nil {
-			log.Print(err)
-			continue
+			go HandleUpload(conn)
 		}
-
-		go HandleUpload(conn)
 	}
 
+exit:
+	log.Println("Upload server exited.")
 	return nil
 }
