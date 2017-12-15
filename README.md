@@ -41,7 +41,7 @@ To send data to the upload server, the following command can be used:
 
 ## Configuration
 
-The server can be configured via command line flags with the -ConfigPath option,
+The server can be configured via command line flags with the -config option,
 specifying a path to the configuration file.
 If no configuration file is provided the server will run with the default settings.
 
