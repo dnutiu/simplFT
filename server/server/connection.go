@@ -101,8 +101,8 @@ func shutdownHandler() {
 			}()
 			wg.Wait()
 
-			go ShutdownFtpServer()
-			go ShutdownUploadServer()
+			ShutdownFtpServer()
+			ShutdownUploadServer()
 			return
 		}
 	}
