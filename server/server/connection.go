@@ -35,6 +35,9 @@ var uploadDirectory string
 // uploadTimeout is the amount in seconds the server will wait for a file to be uploaded
 var uploadTimeout time.Duration
 
+// uploadEnabled holds true of false, if in the config upload was enabled when the upload server was started.
+var uploadEnabled bool
+
 // Shutdown is the shutdown where SIGINT and SIGTERM is send too
 var Shutdown = make(chan os.Signal)
 var ftpShutdown = make(chan struct{})
@@ -109,7 +112,7 @@ func shutdownHandler() {
 }
 
 func ShutdownUploadServer() {
-	if viper.GetBool("upload.enabled") == true {
+	if uploadEnabled == true {
 		if uploadListener != nil {
 			uploadListener.Close()
 		}
@@ -276,7 +279,8 @@ func HandleUpload(conn net.Conn) {
 func StartUploadServer(wg *sync.WaitGroup) error {
 	defer wg.Done()
 	var err error
-	if viper.GetBool("upload.enabled") == false {
+	uploadEnabled = viper.GetBool("upload.enabled")
+	if uploadEnabled == false {
 		log.Println("Uploading not enabled. To enable modify the config file and restart the server")
 		return ErrUploadServerFailure
 	}
