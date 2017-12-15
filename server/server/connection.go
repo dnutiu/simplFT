@@ -36,9 +36,9 @@ var uploadDirectory string
 var uploadTimeout time.Duration
 
 // Shutdown is the shutdown where SIGINT and SIGTERM is send too
-var Shutdown = make(chan os.Signal, 1)
-var ftpShutdown = make(chan struct{}, 1)
-var uploadShutdown = make(chan struct{}, 1)
+var Shutdown = make(chan os.Signal)
+var ftpShutdown = make(chan struct{})
+var uploadShutdown = make(chan struct{})
 
 var uploadListener net.Listener
 var ftpListener net.Listener
@@ -101,18 +101,20 @@ func shutdownHandler() {
 			}()
 			wg.Wait()
 
-			ShutdownFtpServer()
 			ShutdownUploadServer()
+			ShutdownFtpServer()
 			return
 		}
 	}
 }
 
 func ShutdownUploadServer() {
-	if uploadListener != nil {
-		uploadListener.Close()
+	if viper.GetBool("upload.enabled") == true {
+		if uploadListener != nil {
+			uploadListener.Close()
+		}
+		uploadShutdown <- struct{}{}
 	}
-	uploadShutdown <- struct{}{}
 }
 
 func ShutdownFtpServer() {
