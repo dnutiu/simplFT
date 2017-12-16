@@ -6,7 +6,7 @@ go:
   - master
 
 go_import_path:
-  - src/github.com/metonimie/simpleFTP
+  - github.com/metonimie/simpleFTP
 
 install:
 #  - go get -t -v ./...
