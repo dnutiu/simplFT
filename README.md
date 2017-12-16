@@ -1,4 +1,7 @@
 # simplFT
+
+[![Build Status](https://travis-ci.org/Metonimie/simplFT.svg?branch=master)](https://travis-ci.org/Metonimie/simplFT)
+
 This project was made for the purpose of me to learn and understand Go better and also for the Computer Networking class
 that I took in Fall 2017 at UPT.
 
