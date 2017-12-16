@@ -10,6 +10,7 @@ go_import_path:
 
 install:
 #  - go get -t -v ./...
+  - go get -t -v github.com/metonimie/simpleFTP/
   - go get -t -v github.com/fsnotify/fsnotify
   - go get -t -v github.com/spf13/viper
   - go get -t -v github.com/hashicorp/hcl
