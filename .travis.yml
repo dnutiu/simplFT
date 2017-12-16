@@ -5,6 +5,9 @@ language: go
 go:
   - master
 
+go_import_path:
+  - src/github.com/metonimie/simpleFTP
+
 install:
 #  - go get -t -v ./...
   - go get -t -v github.com/fsnotify/fsnotify
@@ -17,3 +20,5 @@ install:
 
 script:
   - go test ./...
+  - go test -v -race ./...
+  - go vet ./...
