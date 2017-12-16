@@ -6,7 +6,15 @@ go:
   - master
 
 install:
-  - go get -t -v ./...
+#  - go get -t -v ./...
+  - go get -t -v github.com/fsnotify/fsnotify
+  - go get -t -v golang.org/x/sys
+  - go get -t -v github.com/spf13/viper
+  - go get -t -v github.com/hashicorp/hcl
+  - go get -t -v github.com/magiconair/properties
+  - go get -t -v github.com/mitchellh/mapstructure
+  - go get -t -v github.com/pelletier/go-toml
+  - go get -t -v github.com/spf13/afero
 
 script:
   - go test ./...
