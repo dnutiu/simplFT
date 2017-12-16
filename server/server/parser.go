@@ -53,7 +53,7 @@ func ProcessInput(c Client, text string) error {
 		}
 
 		// Get the file
-		err = SendAsciiPic(c, commands[1])
+		err = SendASCIIPic(c, commands[1])
 		if err != nil {
 			return &InputError{thisCommand, err}
 		}

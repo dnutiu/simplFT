@@ -36,8 +36,8 @@ func UploadFile(c Client, filename string) error {
 	return nil
 }
 
-// SendAsciiPic sends an image as ascii text to the client.
-func SendAsciiPic(c Client, path string) error {
+// SendASCIIPic sends an image as ascii text to the client.
+func SendASCIIPic(c Client, path string) error {
 	f, err := os.Open(MakePathFromStringStack(c.Stack()) + path)
 	if err != nil {
 		log.Println(err)
@@ -159,6 +159,7 @@ func ChangeDirectoryCommand(c Client, directory string) error {
 	return err
 }
 
+// ShowHelp writes the help text to the client.
 func ShowHelp(c Client) error {
 	var helpText = `
 The available commands are:
