@@ -1,0 +1,12 @@
+language: go
+
+
+
+go:
+  - master
+
+install:
+  - go get -t ./...
+
+script:
+  - go test ./...
