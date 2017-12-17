@@ -6,7 +6,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/metonimie/simpleFTP/server/server"
+	"github.com/metonimie/simplFT/server/server"
 )
 
 func main() {
