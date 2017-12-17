@@ -7,7 +7,6 @@ go:
 
 install:
 #  - go get -t -v ./...
-  - go get -t -v github.com/metonimie/simplFT/server/server
   - go get -t -v github.com/zyxar/image2ascii/ascii
   - go get -t -v github.com/fsnotify/fsnotify
   - go get -t -v github.com/spf13/viper
