@@ -5,6 +5,8 @@ language: go
 go:
   - master
 
+go_import_path: src/
+
 install:
 #  - go get -t -v ./...
   - go get -t -v github.com/zyxar/image2ascii/ascii
