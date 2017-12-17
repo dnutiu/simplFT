@@ -1,7 +1,7 @@
 # simplFT
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/Metonimie/simplFT)](https://goreportcard.com/report/github.com/Metonimie/simplFT)
-[![Build Status](https://travis-ci.org/Metonimie/simplFT.svg?branch=master)](https://travis-ci.org/Metonimie/simplFT)
+[![Build Status](https://travis-ci.org/metonimie/simplFT.svg?branch=master)](https://travis-ci.org/metonimie/simplFT)
 
 This project was made for the purpose of me to learn and understand Go better and also for the Computer Networking class
 that I took in Fall 2017 at UPT.
