@@ -21,11 +21,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// DataBufferSize the maximum size of the data buffer.
-// The data buffer is used at reading from files, the buffer
-// is also send to the client.
-const DataBufferSize = 1024 * 1024
-
 // ConfigPath is used by the config package to find the config file.
 var ConfigPath string
 
