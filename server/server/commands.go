@@ -63,7 +63,7 @@ func SendASCIIPic(c Client, path string) error {
 
 // GetFile sends the file to the client and returns true if it succeeds and false otherwise.
 // it also returns the total number of send bytes.
-func GetFile(c Client, path string) (int, error) {
+func GetFile(c Client, path string) (int64, error) {
 	fileName, sanitized := sanitizeFilePath(path)
 	if sanitized {
 		return 0, ErrSlashNotAllowed
@@ -76,22 +76,7 @@ func GetFile(c Client, path string) (int, error) {
 	}
 	defer file.Close()
 
-	var data = make([]byte, DataBufferSize, DataBufferSize)
-	totalSend := 0
-	for {
-		n, err := file.Read(data)
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			return totalSend, err
-		}
-
-		totalSend += n
-		_, err = c.Connection().Write(data)
-		if err != nil {
-			break
-		}
-	}
+	totalSend, err := io.Copy(c.Connection(), file)
 
 	return totalSend, nil
 }
