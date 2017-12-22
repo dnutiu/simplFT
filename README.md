@@ -19,7 +19,7 @@ ls             - List the files in the current directory.
 cd             - Changes the directory.
 clear          - Clear the screen.
 exit           - Close the connection with the server.c
-pic            - Returns the ascii art of an image. :-)
+pic <filename> - Returns the ascii art of an image. :-)
 ```
 
 #### Sending commands via netcat
