@@ -293,16 +293,16 @@ func StartUploadServer(wg *sync.WaitGroup) error {
 	uploadListener, err = net.Listen("tcp", fmt.Sprintf("%s:%d", addr, port))
 	if err != nil {
 		log.Println(err)
-		return err
+		goto exit
 	}
 	defer uploadListener.Close()
 
-	err = os.Mkdir(uploadDirectory, 0740)
+	err = os.Mkdir(BasePath+"/"+uploadDirectory, 0740)
 	if err != nil {
-		if _, err := os.Stat(uploadDirectory); err != nil {
+		if _, err := os.Stat(BasePath + "/" + uploadDirectory); err != nil {
 			if os.IsNotExist(err) {
 				log.Println("Can't create upload directory!")
-				return err
+				goto exit
 			}
 		}
 	}
