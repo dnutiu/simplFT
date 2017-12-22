@@ -78,7 +78,7 @@ func GetFile(c Client, path string) (int64, error) {
 
 	totalSend, err := io.Copy(c.Connection(), file)
 
-	return totalSend, nil
+	return totalSend, err
 }
 
 func sanitizeFilePath(path string) (string, bool) {
