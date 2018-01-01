@@ -117,3 +117,26 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 ➜  server git:(master) ✗ docker container stop 90b6f00b1331
 90b6f00b1331
 ```
+
+#### Example docker config
+
+```json
+{
+    "address": "0.0.0.0",
+    "port": 8080,
+    "maxDirDepth": 30,
+    "absoluteServePath": "/externalVolume",
+    "pic": {
+        "color": true,
+        "x": 197,
+        "y": 50
+    },
+    "upload": {
+        "enabled": true,
+        "directory": "upload",
+        "timeout": 5,
+        "address": "0.0.0.0",
+        "port": 8081
+    }
+}
+```
