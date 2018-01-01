@@ -21,8 +21,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-// ConfigPath is used by the config package to find the config file.
+// ConfigPath is used by the config package to find the path of the config file.
 var ConfigPath string
+
+// ConfigName is used by the config package to find the config file.
+var ConfigName string
 
 // uploadDirectory is the directory where the files will be uploaded
 var uploadDirectory string
@@ -128,7 +131,7 @@ func Init() {
 	clients = make(map[Client]bool)
 	go shutdownHandler()
 
-	config.InitializeConfiguration("config", ConfigPath)
+	config.InitializeConfiguration(ConfigName, ConfigPath)
 	config.ChangeCallback(func(event fsnotify.Event) {
 		log.Println("Configuration reloaded successfully!")
 	})

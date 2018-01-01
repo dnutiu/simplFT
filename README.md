@@ -71,6 +71,8 @@ Sample Configuration File:
 }
 ```
 
+```./simplFT --help``` will list all the command line flags with the associated help text.
+
 The **config.json** file contains the following settings:
 
 1. address           - The address on which to serve

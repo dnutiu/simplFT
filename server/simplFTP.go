@@ -10,6 +10,8 @@ import (
 )
 
 func main() {
+	flag.StringVar(&server.ConfigName, "config-name", "config",
+		"Set the name of the config file.")
 	flag.StringVar(&server.ConfigPath, "config", ".", "Set the location of the config file.")
 	flag.Parse()
 
