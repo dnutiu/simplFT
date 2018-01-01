@@ -17,7 +17,7 @@ import (
 	"sync"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/metonimie/simplFT/server/server/config"
+	"github.com/metonimie/simplFT/server/config"
 	"github.com/spf13/viper"
 )
 

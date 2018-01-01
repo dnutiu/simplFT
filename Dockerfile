@@ -2,23 +2,20 @@
 FROM golang:1.7
 
 # Make a directory called simplFT
-RUN mkdir -p /go/src/github.com/metonimie/simplFT/server
+RUN mkdir -p /go/src/github.com/metonimie/simplFT/
 
 # Copy the current dir contents into simplFT
-ADD . /go/src/github.com/metonimie/simplFT/server
+ADD . /go/src/github.com/metonimie/simplFT/
 
 # Set the working directory to simplFT
-WORKDIR /go/src/github.com/metonimie/simplFT/server
-
-# Make port 80 available to the world outside this container
-EXPOSE 8080
+WORKDIR /go/src/github.com/metonimie/simplFT/
 
 # Install dependencies
 RUN go get "github.com/zyxar/image2ascii/ascii"
 RUN go get "github.com/spf13/viper"
 
 # Build the application
-RUN go build ./simplFTP.go
+RUN go build ./main.go
 
 # Run simplFT when the container launches
-CMD ["./simplFTP", "-config-name", "docker-config"]
+CMD ["./main", "-config-name", "docker-config"]
