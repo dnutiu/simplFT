@@ -88,3 +88,32 @@ The **config.json** file contains the following settings:
 6. upload            - Settings for the upload server.
 If one of the settings are changed, the server will reload the configuration.
 Except for the absoluteServePath.
+
+## Docker
+
+To build the image run: ```docker build -t simplft .``` and to run the server:
+
+```
+docker run -d \
+  -it \
+  --name devtest \
+  --mount type=bind,source="/Users/denis/Downloads",target=/externalVolume \
+  -p 8080:8080 -p 8081:8081 \
+  simplft
+```
+
+* ```-p PORT1:PORT2``` - PORT1 is the host machine's port mapped to the container's PORT2
+* ```source="/Users/denis/Downloads"``` - This path should be changed to the path from where you want to serve files.
+
+To stop the server you will first need to identify the running container and the stop it via 
+```docker container stop CONTAINER ID```
+
+##### Stopping the server
+
+```
+➜  server git:(master) ✗ docker container ls
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                             NAMES
+90b6f00b1331        simplft             "./simplFTP -confi..."   2 minutes ago       Up 2 minutes        0.0.0.0:8081->8081/tcp, 0.0.0.0:32768->8080/tcp   devtest
+➜  server git:(master) ✗ docker container stop 90b6f00b1331
+90b6f00b1331
+```
