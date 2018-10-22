@@ -1,0 +1,9 @@
+# OS Files
+*.DS_Store
+
+# IDE's
+*.idea/*
+*.vscode/*
+
+# Configuration File
+config.json
