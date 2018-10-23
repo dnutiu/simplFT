@@ -8,7 +8,7 @@ import (
 
 func TestLoadConfigFromFile(t *testing.T) {
 	// SetDefaultConfiguration must be called BEFORE LoadConfigFromFile.
-	InitializeConfiguration("config", "./")
+	InitializeConfiguration("docker-config", "./")
 
 	Address := viper.GetString("address")
 	if Address == "" {
